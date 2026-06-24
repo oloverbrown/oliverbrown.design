@@ -17,7 +17,10 @@
       "Bash(git add *)",
       "Bash(git config *)",
       "Bash(git rm *)",
-      "Bash(git commit -q -m ' *)"
+      "Bash(git commit -q -m ' *)",
+      "Read(//Users/oliverbrown/.config/**)",
+      "Read(//Users/oliverbrown/**)",
+      "Bash(git credential-osxkeychain *)"
     ]
   }
 }
