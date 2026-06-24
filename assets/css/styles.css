@@ -126,6 +126,40 @@ a { color: inherit; }
   display: block;
   width: 750px;
   height: auto;
+  position: relative;
+  z-index: 3;
+}
+
+/* Pink rectangle behind the door, centered on the window hole */
+.intro__door::before {
+  content: '';
+  position: absolute;
+  width: 40%;
+  aspect-ratio: 639 / 603;
+  top: 23.5%;
+  left: 59.5%;
+  transform: translate(-50%, -50%);
+  background: var(--inside-bg);
+  z-index: 1;
+}
+
+/* Kids canvas layers sit just above their pink region. */
+.kids-canvas { pointer-events: none; }
+
+/* Door-region kids: between the pink rectangle (z1) and the door (z3). */
+.kids-canvas--door {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  height: 80%;
+  z-index: 2;
+}
+
+/* Lower-region kids: above the pink section backgrounds, below content. */
+.kids-canvas--lower {
+  position: absolute;
+  z-index: 1;
 }
 
 /* Text — front layer, each block only as wide as its longest line. */
@@ -156,6 +190,8 @@ a { color: inherit; }
 .about {
   max-width: 720px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .about h2 {
@@ -264,24 +300,6 @@ a { color: inherit; }
   border-style: solid;
   border-width: 12px 0 12px 20px;
   border-color: transparent transparent transparent var(--inside-accent);
-}
-
-/* ---------- Scattered children (inside the classroom) ---------- */
-.children {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.child {
-  position: absolute;
-  width: 56px;
-  height: 85px;
-  /* the white silhouette png is used as a mask so we can tint it */
-  -webkit-mask: url('../../sprites/child.png') no-repeat center / contain;
-  mask: url('../../sprites/child.png') no-repeat center / contain;
-  opacity: 0.55;
 }
 
 /* ---------- Contact ---------- */

@@ -99,23 +99,6 @@ function renderPortfolio(cfg) {
   });
 }
 
-function renderChildren(cfg) {
-  const layer = document.getElementById('children');
-  if (!layer) return;
-  const colors = cfg.theme.childColors || [];
-  // Deterministic-ish scatter so it looks intentional, not random noise.
-  const spots = [
-    [4, 14], [16, 52], [9, 80], [28, 22], [34, 68], [44, 88],
-    [58, 12], [66, 58], [74, 84], [86, 20], [92, 60], [50, 40]
-  ];
-  spots.forEach(([top, left], n) => {
-    layer.appendChild(el('span', {
-      class: 'child',
-      style: `top:${top}%; left:${left}%; background-color:${colors[n % colors.length]};`
-    }));
-  });
-}
-
 function renderContact(cfg) {
   const box = document.getElementById('contact-content');
   if (!box) return;
@@ -145,9 +128,10 @@ async function init() {
     renderIntro(cfg);
     renderAbout(cfg);
     renderPortfolio(cfg);
-    renderChildren(cfg);
     renderContact(cfg);
     renderFooter(cfg);
+    // Layout is now in the DOM; let the kids simulation measure regions.
+    document.dispatchEvent(new Event('ob:ready'));
   } catch (err) {
     console.error(err);
     document.body.insertAdjacentHTML(
