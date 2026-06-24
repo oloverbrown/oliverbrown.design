@@ -109,11 +109,11 @@ a { color: inherit; }
 }
 
 .intro__col {
-  font-size: 2rem;
-  font-weight: 400;
+  font-size: 3.46rem;
+  font-weight: 300;
   line-height: 1.32;
   text-align: center;
-  color: var(--outside-text);
+  color: inherit;
 }
 
 .intro__door {
@@ -123,33 +123,12 @@ a { color: inherit; }
 
 .door-img {
   display: block;
-  width: 300px;
+  width: 750px;
   max-width: 100%;
   height: auto;
 }
 
-/* Colorful frosted-glass glow behind the door window —
-   a hint of the vibrant classroom inside. */
-.door-glow {
-  position: absolute;
-  top: 8.5%;
-  left: 53%;
-  width: 13%;
-  height: 30%;
-  border-radius: 3px;
-  background:
-    radial-gradient(circle at 28% 22%, #f6cfa6 0 16%, transparent 42%),
-    radial-gradient(circle at 72% 68%, #f4a9c2 0 18%, transparent 46%),
-    radial-gradient(circle at 60% 40%, #bcd4f2 0 14%, transparent 40%),
-    linear-gradient(160deg, #d9a9ec, #f0b8e6 50%, #c9b6f0);
-  filter: blur(1.2px);
-  animation: glow 6s ease-in-out infinite alternate;
-}
-
-@keyframes glow {
-  from { opacity: 0.75; }
-  to { opacity: 1; }
-}
+.door-glow { display: none; }
 
 .scroll-cue {
   display: block;
@@ -444,9 +423,9 @@ a { color: inherit; }
   .nav { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
   .nav__links { gap: 1.25rem; }
   .intro { grid-template-columns: 1fr; }
-  .intro__col { font-size: 1.7rem; order: 2; }
+  .intro__col { font-size: 2.4rem; order: 2; }
   .intro__door { order: 1; }
-  .door-img { width: 220px; }
+  .door-img { width: 360px; }
   .piece { grid-template-columns: 1fr; }
   .piece-page__title { font-size: 2rem; }
 }
