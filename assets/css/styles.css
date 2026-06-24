@@ -97,25 +97,29 @@ a { color: inherit; }
   margin-right: auto;
 }
 
-/* ---------- Intro ---------- */
+/* ---------- Intro ----------
+   Door and text are two stacked layers (door behind, text in front).
+   The three pieces sit in a centered flex row sized to the ACTUAL
+   wrapped text width (max-content), so the whole composition is
+   centered on real content — not on fixed-width text boxes. */
 .intro {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 0;
   max-width: none;
   margin: 2rem 0 0;
   min-height: 72vh;
 }
 
-/* Door sits on its own layer behind the text */
+/* Door — its own layer, behind the text, but kept in flow so it
+   contributes its width to the group's centering. */
 .intro__door {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   z-index: 1;
+  flex: 0 0 auto;
+  display: block;
+  cursor: pointer;
 }
 
 .door-img {
@@ -124,9 +128,12 @@ a { color: inherit; }
   height: auto;
 }
 
+/* Text — front layer, each block only as wide as its longest line. */
 .intro__col {
   position: relative;
   z-index: 2;
+  width: max-content;
+  text-align: center;
   font-size: 3.46rem;
   font-weight: 350;
   line-height: 1.32;
@@ -135,33 +142,15 @@ a { color: inherit; }
 
 .intro__col div { white-space: nowrap; }
 
-/* Text aligned inward — left column right-aligns, right column left-aligns */
-.intro__col--left {
-  text-align: center;
-  padding-right: 2rem;
-}
+/* Text sits in front visually but lets clicks pass through to the door button */
+.intro__col { pointer-events: none; }
 
-.intro__col--right {
-  text-align: center;
-  padding-left: 12rem;
-}
+/* Overlap the text in front of the door for the layered look. */
+.intro__col--left { margin-right: -90px; }
+.intro__col--right { margin-left: -90px; }
 
 .door-glow { display: none; }
 
-.scroll-cue {
-  display: block;
-  width: max-content;
-  margin: 3rem auto 0;
-  font-size: 1.6rem;
-  text-decoration: none;
-  color: var(--outside-muted);
-  animation: bob 1.8s ease-in-out infinite;
-}
-
-@keyframes bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
-}
 
 /* ---------- About ---------- */
 .about {
@@ -440,8 +429,8 @@ a { color: inherit; }
 @media (max-width: 760px) {
   .nav { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
   .nav__links { gap: 1.25rem; }
-  .intro { grid-template-columns: 1fr; }
-  .intro__col { font-size: 2.4rem; order: 2; }
+  .intro { flex-direction: column; }
+  .intro__col { font-size: 2.4rem; order: 2; margin: 0; }
   .intro__door { order: 1; }
   .door-img { width: 360px; }
   .piece { grid-template-columns: 1fr; }
