@@ -20,7 +20,7 @@
       "line": "#9a9a9a"
     },
     "inside": {
-      "background": "#f6bfe4",
+      "background": "#F7C9FF",
       "text": "#4a3340",
       "card": "#ffffff",
       "accent": "#6c3fa0"
@@ -28,13 +28,14 @@
     "childColors": ["#f4a9c2", "#bcd4f2", "#f6e6a0", "#c6e8c2", "#f6cfa6", "#d8c0ec"]
   },
   "intro": {
-    "lines": [
-      "Hi, I'm Oliver,",
-      "a teacher and designer.",
-      "",
-      "I build targeted EdTech",
-      "that makes learners into doers",
-      "and lets teachers be teachers."
+    "leftLines": ["Hi", "I'm", "Oliver", "a teacher", "and", "designer"],
+    "rightLines": [
+      "I build targeted",
+      "EdTech that",
+      "makes learners",
+      "into doers and",
+      "lets teachers",
+      "be teachers"
     ]
   },
   "about": {

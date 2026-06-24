@@ -56,11 +56,11 @@ function renderNav(cfg, brandHref = '#intro', linkPrefix = '') {
 }
 
 function renderIntro(cfg) {
-  const box = document.getElementById('intro-text');
-  if (!box) return;
-  cfg.intro.lines.forEach((line) => {
-    box.appendChild(line === '' ? el('span', { class: 'blank' }) : el('div', { text: line }));
-  });
+  const left = document.getElementById('intro-left');
+  const right = document.getElementById('intro-right');
+  const { leftLines = [], rightLines = [] } = cfg.intro;
+  if (left) leftLines.forEach((line) => left.appendChild(el('div', { text: line })));
+  if (right) rightLines.forEach((line) => right.appendChild(el('div', { text: line })));
 }
 
 function renderAbout(cfg) {
