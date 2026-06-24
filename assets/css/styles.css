@@ -1,0 +1,448 @@
+/* ============================================================
+   oliverbrown.design
+   Theme tokens are injected from config.json by main.js as
+   CSS custom properties on :root.
+   ============================================================ */
+
+:root {
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  --outside-bg: #ffffff;
+  --outside-text: #3a3a3a;
+  --outside-muted: #8a8a8a;
+  --outside-line: #9a9a9a;
+
+  --inside-bg: #f6bfe4;
+  --inside-text: #4a3340;
+  --inside-card: #ffffff;
+  --inside-accent: #6c3fa0;
+
+  --maxw: 1080px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--outside-text);
+  background: var(--outside-bg);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.45;
+}
+
+a { color: inherit; }
+
+/* ---------- Navigation (not fixed) ---------- */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1.6rem 2rem;
+}
+
+.nav__brand {
+  font-size: 1.25rem;
+  font-weight: 500;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+}
+
+.nav__links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav__link {
+  font-size: 1.15rem;
+  font-weight: 400;
+  text-decoration: none;
+  color: var(--outside-text);
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.18s ease, opacity 0.18s ease;
+}
+
+.nav__link:hover { border-color: currentColor; }
+
+/* ---------- Sections ---------- */
+.section {
+  padding: 4rem 2rem 6rem;
+  scroll-margin-top: 1rem;
+}
+
+.section--outside {
+  background: var(--outside-bg);
+  color: var(--outside-text);
+}
+
+.section--inside {
+  position: relative;
+  overflow: hidden;
+  background: var(--inside-bg);
+  color: var(--inside-text);
+}
+
+.section__heading {
+  font-size: 2rem;
+  font-weight: 500;
+  margin: 0 0 2.5rem;
+  max-width: var(--maxw);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---------- Intro ---------- */
+.intro {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  gap: 2rem;
+  max-width: var(--maxw);
+  margin: 2rem auto 0;
+  min-height: 60vh;
+}
+
+.intro__text {
+  font-size: 2.1rem;
+  font-weight: 300;
+  line-height: 1.4;
+  color: var(--outside-text);
+}
+
+.intro__text .blank { display: block; height: 1.1rem; }
+
+.intro__door {
+  position: relative;
+  justify-self: center;
+}
+
+.door-img {
+  display: block;
+  width: 320px;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Colorful frosted-glass glow behind the door window —
+   a hint of the vibrant classroom inside. */
+.door-glow {
+  position: absolute;
+  top: 8.5%;
+  left: 53%;
+  width: 13%;
+  height: 30%;
+  border-radius: 3px;
+  background: linear-gradient(160deg, #f6e6a0, #f4a9c2 45%, #bcd4f2);
+  filter: blur(1px);
+  animation: glow 6s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { opacity: 0.75; }
+  to { opacity: 1; }
+}
+
+.scroll-cue {
+  display: block;
+  width: max-content;
+  margin: 3rem auto 0;
+  font-size: 1.6rem;
+  text-decoration: none;
+  color: var(--outside-muted);
+  animation: bob 1.8s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+/* ---------- About ---------- */
+.about {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.about h2 {
+  font-size: 2rem;
+  font-weight: 500;
+  margin: 0 0 1.5rem;
+}
+
+.about p {
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin: 0 0 1.2rem;
+  color: var(--outside-text);
+}
+
+/* ---------- Portfolio ---------- */
+.portfolio {
+  position: relative;
+  z-index: 2;
+}
+
+.portfolio__grid {
+  display: grid;
+  gap: 2.5rem;
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+
+.piece {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  align-items: center;
+  gap: 2rem;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(2px);
+  border-radius: 14px;
+  padding: 1.75rem;
+  text-decoration: none;
+  color: var(--inside-text);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.piece:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px rgba(80, 40, 70, 0.18);
+}
+
+.piece__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.75rem;
+}
+
+.piece__blurb {
+  font-size: 1.05rem;
+  font-weight: 300;
+  margin: 0 0 1.2rem;
+}
+
+.piece__more {
+  display: inline-block;
+  font-size: 0.95rem;
+  padding: 0.45rem 1.1rem;
+  border: 1px solid var(--inside-accent);
+  border-radius: 999px;
+  color: var(--inside-accent);
+}
+
+.piece:hover .piece__more {
+  background: var(--inside-accent);
+  color: #fff;
+}
+
+/* Thumbnail with play button (matches the design mockups) */
+.piece__thumb {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1d1320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.piece__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.piece__play {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.piece__play::after {
+  content: "";
+  margin-left: 4px;
+  border-style: solid;
+  border-width: 12px 0 12px 20px;
+  border-color: transparent transparent transparent var(--inside-accent);
+}
+
+/* ---------- Scattered children (inside the classroom) ---------- */
+.children {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.child {
+  position: absolute;
+  width: 56px;
+  height: 85px;
+  /* the white silhouette png is used as a mask so we can tint it */
+  -webkit-mask: url('../../sprites/child.png') no-repeat center / contain;
+  mask: url('../../sprites/child.png') no-repeat center / contain;
+  opacity: 0.55;
+}
+
+/* ---------- Contact ---------- */
+.section--contact { padding-bottom: 4rem; }
+
+.contact {
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.contact h2 {
+  font-size: 2rem;
+  font-weight: 500;
+  margin: 0 0 1rem;
+}
+
+.contact p {
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin: 0 0 1.5rem;
+}
+
+.contact__email {
+  display: inline-block;
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  text-decoration: none;
+  border-bottom: 2px solid var(--inside-accent);
+}
+
+.contact__links {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.contact__links a {
+  font-size: 1.05rem;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.contact__links a:hover { border-color: currentColor; }
+
+/* ---------- Footer ---------- */
+.footer {
+  padding: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--outside-muted);
+  background: var(--outside-bg);
+}
+
+/* ============================================================
+   Portfolio sub-page
+   ============================================================ */
+.subpage { background: var(--inside-bg); color: var(--inside-text); }
+
+.subpage .nav__link,
+.subpage .nav__brand { color: var(--inside-text); }
+
+.piece-page {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1rem 2rem 6rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 2rem;
+  text-decoration: none;
+  font-size: 1rem;
+  border-bottom: 1px solid transparent;
+}
+.back-link:hover { border-color: currentColor; }
+
+.piece-page__title {
+  font-size: 2.6rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.5rem;
+}
+
+.piece-page__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0 0 2rem;
+}
+
+.tag {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.piece-page__hero {
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #1d1320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.piece-page__hero img,
+.piece-page__hero video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.piece-page__body {
+  max-width: 720px;
+}
+
+.piece-page__body p {
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin: 0 0 1.3rem;
+}
+
+.piece-page__facts {
+  display: flex;
+  gap: 3rem;
+  flex-wrap: wrap;
+  margin: 2rem 0 0;
+  font-size: 1rem;
+}
+
+.piece-page__facts dt {
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.piece-page__facts dd { margin: 0; font-weight: 300; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+  .nav { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+  .nav__links { gap: 1.25rem; }
+  .intro { grid-template-columns: 1fr; }
+  .intro__text { font-size: 1.7rem; }
+  .door-img { width: 220px; }
+  .piece { grid-template-columns: 1fr; }
+  .piece-page__title { font-size: 2rem; }
+}

@@ -1,0 +1,91 @@
+{
+  "site": {
+    "name": "oliverbrown.design",
+    "brand": "ob.design",
+    "title": "Oliver Brown — Teacher & Designer",
+    "description": "Oliver Brown builds targeted EdTech that makes learners into doers and lets teachers be teachers.",
+    "font": "'Helvetica Neue', Helvetica, Arial, sans-serif"
+  },
+  "nav": [
+    { "label": "ob.design", "href": "#intro" },
+    { "label": "about", "href": "#about" },
+    { "label": "portfolio", "href": "#portfolio" },
+    { "label": "contact", "href": "#contact" }
+  ],
+  "theme": {
+    "outside": {
+      "background": "#ffffff",
+      "text": "#3a3a3a",
+      "muted": "#8a8a8a",
+      "line": "#9a9a9a"
+    },
+    "inside": {
+      "background": "#f6bfe4",
+      "text": "#4a3340",
+      "card": "#ffffff",
+      "accent": "#6c3fa0"
+    },
+    "childColors": ["#f4a9c2", "#bcd4f2", "#f6e6a0", "#c6e8c2", "#f6cfa6", "#d8c0ec"]
+  },
+  "intro": {
+    "lines": [
+      "Hi, I'm Oliver,",
+      "a teacher and designer.",
+      "",
+      "I build targeted EdTech",
+      "that makes learners into doers",
+      "and lets teachers be teachers."
+    ]
+  },
+  "about": {
+    "heading": "About",
+    "paragraphs": [
+      "I'm a teacher who designs and builds educational technology. After years in the classroom, I started making the tools I always wished I had — software that targets the specific things learners struggle with, and gets out of the teacher's way.",
+      "I work across the whole stack: pedagogy, interaction design, and code. Each project starts from a real classroom problem and ends as something children actually want to use.",
+      "Step through the door and take a look around the classroom."
+    ]
+  },
+  "portfolio": {
+    "heading": "Portfolio",
+    "pieces": [
+      {
+        "slug": "treasure-box",
+        "title": "TREASURE BOX",
+        "blurb": "Learners solve a huge variety of math tasks using an innovative place value modeling tool.",
+        "tags": ["Place value", "Math modeling", "Interaction design"],
+        "year": "2025",
+        "role": "Design & development",
+        "overview": [
+          "Treasure Box reimagines place value as something you can pick up, group, and trade. Learners build numbers physically inside the app and solve a wide range of math tasks using a single, consistent mental model.",
+          "The tool grows with the learner — the same interface that introduces tens and ones scales up to decimals and operations, so the underlying idea never has to be re-taught."
+        ],
+        "image": "",
+        "video": ""
+      },
+      {
+        "slug": "memory-metro",
+        "title": "MEMORY METRO",
+        "blurb": "Unique math practice + working memory training game. Solo developed with Claude Code.",
+        "tags": ["Working memory", "Math fluency", "Game design"],
+        "year": "2025",
+        "role": "Solo design & development",
+        "overview": [
+          "Memory Metro blends math fluency practice with genuine working-memory training. Players route trains through a growing transit map while holding and updating numbers in their head — the difficulty adapts to keep each learner at the edge of their capacity.",
+          "Designed and built solo with Claude Code, from the game loop and difficulty model down to the art direction."
+        ],
+        "image": "",
+        "video": ""
+      }
+    ]
+  },
+  "contact": {
+    "heading": "Contact",
+    "blurb": "Building something for learners or teachers? I'd love to hear about it.",
+    "email": "hello@oliverbrown.design",
+    "links": [
+      { "label": "Email", "href": "mailto:hello@oliverbrown.design" },
+      { "label": "LinkedIn", "href": "https://www.linkedin.com/" },
+      { "label": "GitHub", "href": "https://github.com/" }
+    ]
+  }
+}

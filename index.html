@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oliver Brown — Teacher &amp; Designer</title>
+  <meta name="description" content="Oliver Brown builds targeted EdTech that makes learners into doers and lets teachers be teachers." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <!-- Top navigation (not fixed — scrolls with the page) -->
+  <header class="nav" id="nav"></header>
+
+  <main>
+    <!-- 1. INTRO — "outside the classroom" -->
+    <section id="intro" class="section section--outside">
+      <div class="intro">
+        <div class="intro__text" id="intro-text"></div>
+        <div class="intro__door" aria-hidden="true">
+          <img src="sprites/classroom_door.png" alt="" class="door-img" />
+          <span class="door-glow"></span>
+        </div>
+      </div>
+      <a class="scroll-cue" href="#about" aria-label="Scroll to about">&#8595;</a>
+    </section>
+
+    <!-- 2. ABOUT -->
+    <section id="about" class="section section--outside">
+      <div class="about" id="about-content"></div>
+    </section>
+
+    <!-- 3. PORTFOLIO — "inside the classroom" -->
+    <section id="portfolio" class="section section--inside">
+      <div class="children" id="children" aria-hidden="true"></div>
+      <div class="portfolio">
+        <h2 class="section__heading" id="portfolio-heading"></h2>
+        <div class="portfolio__grid" id="portfolio-grid"></div>
+      </div>
+    </section>
+
+    <!-- 4. CONTACT -->
+    <section id="contact" class="section section--inside section--contact">
+      <div class="contact" id="contact-content"></div>
+    </section>
+  </main>
+
+  <footer class="footer" id="footer"></footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

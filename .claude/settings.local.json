@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m http.server 8765)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8765/config.json)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8765/index.html)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8765/portfolio/treasure-box.html)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8765/assets/js/main.js)",
+      "Bash(python3 -c \"import json; json.load\\(open\\('config.json'\\)\\); print\\('config.json valid'\\)\")",
+      "Bash(ls /Applications/ | grep -i -E 'chrome|chromium|safari' ; ls \"/Applications/Google Chrome.app/Contents/MacOS/\" 2>/dev/null)",
+      "Read(//Applications/**)",
+      "Read(//Applications/Google Chrome.app/Contents/MacOS/**)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --hide-scrollbars --window-size=1280,2400 --screenshot=/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/c82a46ee-f671-446a-a63d-ef15374d156d/scratchpad/landing.png http://localhost:8765/index.html)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --hide-scrollbars --window-size=1280,1400 --screenshot=/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/c82a46ee-f671-446a-a63d-ef15374d156d/scratchpad/piece.png http://localhost:8765/portfolio/treasure-box.html)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --hide-scrollbars --window-size=1280,4200 --screenshot=/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/c82a46ee-f671-446a-a63d-ef15374d156d/scratchpad/full.png http://localhost:8765/index.html)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git config *)",
+      "Bash(git rm *)",
+      "Bash(git commit -q -m ' *)"
+    ]
+  }
+}
