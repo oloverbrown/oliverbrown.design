@@ -15,13 +15,13 @@
   "theme": {
     "outside": {
       "background": "#ffffff",
-      "text": "#3a3a3a",
+      "text": "#000000",
       "muted": "#8a8a8a",
       "line": "#9a9a9a"
     },
     "inside": {
       "background": "#F7C9FF",
-      "text": "#4a3340",
+      "text": "#000000",
       "card": "#ffffff",
       "accent": "#6c3fa0"
     },
@@ -39,7 +39,7 @@
     ]
   },
   "about": {
-    "heading": "About",
+    "heading": "about",
     "paragraphs": [
       "I'm a teacher who designs and builds educational technology. After years in the classroom, I started making the tools I always wished I had — software that targets the specific things learners struggle with, and gets out of the teacher's way.",
       "I work across the whole stack: pedagogy, interaction design, and code. Each project starts from a real classroom problem and ends as something children actually want to use.",
@@ -47,7 +47,7 @@
     ]
   },
   "portfolio": {
-    "heading": "Portfolio",
+    "heading": "portfolio",
     "pieces": [
       {
         "slug": "treasure-box",
@@ -80,13 +80,12 @@
     ]
   },
   "contact": {
-    "heading": "Contact",
+    "heading": "contact",
     "blurb": "Building something for learners or teachers? I'd love to hear about it.",
-    "email": "hello@oliverbrown.design",
+    "email": "omackinnon@gmail.com",
     "links": [
-      { "label": "Email", "href": "mailto:hello@oliverbrown.design" },
-      { "label": "LinkedIn", "href": "https://www.linkedin.com/" },
-      { "label": "GitHub", "href": "https://github.com/" }
+      { "label": "omackinnon@gmail.com", "href": "mailto:omackinnon@gmail.com" },
+      { "label": "linkedin.com/in/oliver--brown/", "href": "https://www.linkedin.com/in/oliver--brown/" }
     ]
   }
 }

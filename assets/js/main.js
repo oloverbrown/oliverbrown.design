@@ -67,7 +67,9 @@ function renderAbout(cfg) {
   const box = document.getElementById('about-content');
   if (!box) return;
   box.appendChild(el('h2', { text: cfg.about.heading }));
-  cfg.about.paragraphs.forEach((p) => box.appendChild(el('p', { text: p })));
+  const wrap = el('div', { class: 'content-box' });
+  cfg.about.paragraphs.forEach((p) => wrap.appendChild(el('p', { text: p })));
+  box.appendChild(wrap);
 }
 
 function thumb(piece) {
@@ -104,11 +106,9 @@ function renderContact(cfg) {
   if (!box) return;
   const c = cfg.contact;
   box.appendChild(el('h2', { text: c.heading }));
-  box.appendChild(el('p', { text: c.blurb }));
-  box.appendChild(el('a', { class: 'contact__email', href: `mailto:${c.email}`, text: c.email }));
   box.appendChild(
-    el('div', { class: 'contact__links' },
-      (c.links || []).map((l) => el('a', { href: l.href, text: l.label, target: '_blank', rel: 'noopener' }))
+    el('div', { class: 'contact__links content-box' },
+      (c.links || []).map((l) => el('a', { class: 'contact__link', href: l.href, text: l.label, target: '_blank', rel: 'noopener' }))
     )
   );
 }
