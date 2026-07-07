@@ -261,14 +261,15 @@ a { color: inherit; }
   display: inline-block;
   font-size: 0.95rem;
   padding: 0.45rem 1.1rem;
-  border: 1px solid var(--inside-accent);
+  border: 1px solid #DCB8FB;
   border-radius: 999px;
-  color: var(--inside-accent);
+  color: #000;
+  background: #DCB8FB;
 }
 
 .piece:hover .piece__more {
-  background: var(--inside-accent);
-  color: #fff;
+  background: #c49ef5;
+  border-color: #c49ef5;
 }
 
 /* Thumbnail with play button (matches the design mockups) */
@@ -304,7 +305,7 @@ a { color: inherit; }
   margin-left: 4px;
   border-style: solid;
   border-width: 12px 0 12px 20px;
-  border-color: transparent transparent transparent var(--inside-accent);
+  border-color: transparent transparent transparent #DCB8FB;
 }
 
 /* ---------- Contact ---------- */
