@@ -51,7 +51,16 @@ function renderNav(cfg) {
 
 function renderHero(piece) {
   const hero = el('div', { class: 'piece-page__hero' });
-  if (piece.video) {
+  if (piece.youtubeId) {
+    const iframe = el('iframe', {
+      src: `https://www.youtube.com/embed/${piece.youtubeId}`,
+      title: piece.title,
+      frameborder: '0',
+      allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+      allowfullscreen: ''
+    });
+    hero.appendChild(iframe);
+  } else if (piece.video) {
     hero.appendChild(el('video', { src: piece.video, controls: '', playsinline: '' }));
   } else if (piece.image) {
     hero.appendChild(el('img', { src: piece.image, alt: piece.title }));

@@ -431,10 +431,12 @@ a { color: inherit; }
 }
 
 .piece-page__hero img,
-.piece-page__hero video {
+.piece-page__hero video,
+.piece-page__hero iframe {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border: none;
 }
 
 .piece-page__body {
