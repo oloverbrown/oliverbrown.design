@@ -67,9 +67,19 @@ function renderAbout(cfg) {
   const box = document.getElementById('about-content');
   if (!box) return;
   box.appendChild(el('h2', { text: cfg.about.heading }));
-  const wrap = el('div', { class: 'content-box' });
-  cfg.about.paragraphs.forEach((p) => wrap.appendChild(el('p', { text: p })));
-  box.appendChild(wrap);
+
+  const blocks = cfg.about.blocks || [];
+  const block = (text) => el('div', { class: 'content-box about__block' }, [el('p', { text })]);
+
+  const row = el('div', { class: 'about__row' });
+
+  row.appendChild(el('img', { class: 'about__photo', src: 'website_photo.png', alt: '' }));
+
+  if (blocks[0]) row.appendChild(block(blocks[0]));
+  row.appendChild(el('div', { class: 'about__image' }));
+  if (blocks[1]) row.appendChild(block(blocks[1]));
+
+  box.appendChild(row);
 }
 
 function thumb(piece) {
@@ -89,10 +99,14 @@ function renderPortfolio(cfg) {
   if (heading) heading.textContent = cfg.portfolio.heading;
 
   cfg.portfolio.pieces.forEach((piece) => {
-    const card = el('a', { class: 'piece', href: `portfolio/${piece.slug}.html` }, [
+    const cardTag = piece.comingSoon ? 'div' : 'a';
+    const cardProps = piece.comingSoon
+      ? { class: 'piece piece--disabled' }
+      : { class: 'piece', href: `portfolio/${piece.slug}.html` };
+    const card = el(cardTag, cardProps, [
       el('div', { class: 'piece__info' }, [
         el('h3', { class: 'piece__title', text: piece.title }),
-        el('p', { class: 'piece__blurb', text: piece.blurb }),
+        el('p', { class: 'piece__blurb', text: piece.subtitle }),
         el('span', { class: 'piece__more', text: 'learn more' })
       ]),
       thumb(piece)
@@ -132,6 +146,12 @@ async function init() {
     renderFooter(cfg);
     // Layout is now in the DOM; let the kids simulation measure regions.
     document.dispatchEvent(new Event('ob:ready'));
+
+    // Re-scroll to hash after rendering — dynamic content above can shift positions.
+    if (window.location.hash) {
+      const target = document.querySelector(window.location.hash);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }
   } catch (err) {
     console.error(err);
     document.body.insertAdjacentHTML(

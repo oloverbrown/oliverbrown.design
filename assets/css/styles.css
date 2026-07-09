@@ -106,8 +106,8 @@ a { color: inherit; }
    centered on real content — not on fixed-width text boxes. */
 .intro {
   position: relative;
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   max-width: none;
   margin: 2rem 0 0;
@@ -169,28 +169,27 @@ a { color: inherit; }
   position: relative;
   z-index: 2;
   width: max-content;
-  text-align: center;
   font-size: 2.6rem;
   font-weight: 350;
   line-height: 1.32;
   color: var(--outside-text);
+  pointer-events: none;
 }
 
 .intro__col div { white-space: nowrap; }
 
-/* Text sits in front visually but lets clicks pass through to the door button */
-.intro__col { pointer-events: none; }
-
-/* Overlap the text in front of the door for the layered look. */
-.intro__col--left { margin-right: -90px; }
-.intro__col--right { margin-left: -90px; }
+/* Each column sits at the edge of its 1fr cell and overlaps the door equally. */
+.intro__col--left  { justify-self: end;   text-align: center; margin-right: -80px; }
+.intro__col--right { justify-self: start; text-align: center; margin-left:  -80px; }
 
 .door-glow { display: none; }
 
 
 /* ---------- About ---------- */
+#about { padding-bottom: 3rem; }
+
 .about {
-  max-width: 720px;
+  max-width: var(--maxw);
   margin: 0 auto;
   position: relative;
   z-index: 2;
@@ -205,10 +204,43 @@ a { color: inherit; }
 }
 
 .about p {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 400;
-  margin: 0 0 1.2rem;
+  margin: 0;
   color: var(--outside-text);
+}
+
+.about__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 0.5fr 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.about__photo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28%;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.about__block {
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.about__image { visibility: hidden; }
+
+.about__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ---------- Portfolio ---------- */
@@ -244,6 +276,16 @@ a { color: inherit; }
   box-shadow: 0 14px 34px rgba(80, 40, 70, 0.18);
 }
 
+.piece--disabled { cursor: default; opacity: 0.6; }
+.piece--disabled:hover { transform: none; box-shadow: none; }
+
+.piece__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 .piece__title {
   font-size: 2rem;
   font-weight: 600;
@@ -254,7 +296,14 @@ a { color: inherit; }
 .piece__blurb {
   font-size: 1.3rem;
   font-weight: 400;
+  margin: 0 0 0.5rem;
+}
+
+.piece__details {
+  font-size: 0.9rem;
+  font-weight: 400;
   margin: 0 0 1.2rem;
+  opacity: 0.7;
 }
 
 .piece__more {
@@ -390,20 +439,29 @@ a { color: inherit; }
 }
 
 .back-link {
-  display: inline-block;
-  margin-bottom: 2rem;
+  display: block;
+  width: fit-content;
+  margin: 0 auto 2rem;
   text-decoration: none;
-  font-size: 1rem;
-  border-bottom: 1px solid transparent;
+  font-size: 0.95rem;
+  padding: 0.45rem 1.1rem;
+  border: 1px solid #DCB8FB;
+  border-radius: 999px;
+  color: #000;
+  background: #DCB8FB;
 }
-.back-link:hover { border-color: currentColor; }
+.back-link:hover { background: #c49ef5; border-color: #c49ef5; }
+.back-link--bottom { margin-top: 2rem; margin-bottom: 0; }
 
 .piece-page__title {
   font-size: 2.6rem;
   font-weight: 600;
   letter-spacing: 0.03em;
   margin: 0 0 0.5rem;
+  text-align: center;
 }
+
+.piece-page .piece__details { text-align: center; font-size: 1rem; }
 
 .piece-page__meta {
   display: flex;
@@ -440,12 +498,13 @@ a { color: inherit; }
 }
 
 .piece-page__body {
-  max-width: 720px;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 .piece-page__body p {
-  font-size: 1.2rem;
-  font-weight: 300;
+  font-size: 1.3rem;
+  font-weight: 400;
   margin: 0 0 1.3rem;
 }
 
@@ -468,8 +527,10 @@ a { color: inherit; }
 @media (max-width: 760px) {
   .nav { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
   .nav__links { gap: 1.25rem; }
-  .intro { flex-direction: column; }
-  .intro__col { font-size: 2.4rem; order: 2; margin: 0; }
+  .intro { grid-template-columns: 1fr; }
+  .intro__col { font-size: 2.4rem; margin: 0; text-align: center; justify-self: center; }
+  .intro__col--left  { order: 2; }
+  .intro__col--right { order: 3; }
   .intro__door { order: 1; }
   .door-img { width: 360px; }
   .piece { grid-template-columns: 1fr; }

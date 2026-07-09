@@ -82,27 +82,20 @@ function renderPiece(cfg, slug) {
 
   document.title = `${piece.title} — ${cfg.site.brand}`;
 
-  root.appendChild(el('a', { class: 'back-link', href: '../index.html#portfolio', text: '← back to portfolio' }));
+  root.appendChild(el('a', { class: 'back-link', href: '../index.html#portfolio', text: 'back to portfolio' }));
   root.appendChild(el('h1', { class: 'piece-page__title', text: piece.title }));
 
-  if (piece.tags && piece.tags.length) {
-    root.appendChild(
-      el('div', { class: 'piece-page__meta' }, piece.tags.map((t) => el('span', { class: 'tag', text: t })))
-    );
+  if (piece.details) {
+    root.appendChild(el('p', { class: 'piece__details', text: piece.details }));
   }
 
   root.appendChild(renderHero(piece));
 
   const body = el('div', { class: 'piece-page__body' });
-  body.appendChild(el('p', { class: 'piece__blurb', text: piece.blurb }));
   (piece.overview || []).forEach((p) => body.appendChild(el('p', { text: p })));
-
-  const facts = el('dl', { class: 'piece-page__facts' });
-  if (piece.role) { facts.appendChild(el('dt', { text: 'Role' })); facts.appendChild(el('dd', { text: piece.role })); }
-  if (piece.year) { facts.appendChild(el('dt', { text: 'Year' })); facts.appendChild(el('dd', { text: piece.year })); }
-  if (facts.children.length) body.appendChild(facts);
-
   root.appendChild(body);
+
+  root.appendChild(el('a', { class: 'back-link back-link--bottom', href: '../index.html#portfolio', text: 'back to portfolio' }));
 }
 
 async function init() {

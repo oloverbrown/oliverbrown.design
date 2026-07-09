@@ -2,7 +2,7 @@
   "site": {
     "name": "oliverbrown.design",
     "brand": "ob.design",
-    "title": "Oliver Brown — Teacher & Designer",
+    "title": "oliverbrown.design",
     "description": "Oliver Brown builds targeted EdTech that makes learners into doers and lets teachers be teachers.",
     "font": "'Helvetica Neue', Helvetica, Arial, sans-serif"
   },
@@ -28,23 +28,16 @@
     "childColors": ["#f4a9c2", "#bcd4f2", "#f6e6a0", "#c6e8c2", "#f6cfa6", "#d8c0ec"]
   },
   "intro": {
-    "leftLines": ["Hi", "I'm", "Oliver", "a teacher", "and", "designer"],
-    "rightLines": [
-      "I build targeted",
-      "EdTech that",
-      "makes learners",
-      "into doers and",
-      "lets teachers",
-      "be teachers"
-    ]
+    "leftLines": ["Hi", "I'm", "Oliver", "a", "senior", "learning", "game", "designer"],
+    "rightLines": ["I", "craft", "playful", "targeted", "learning", "that", "pushes", "EdTech", "forward"]
   },
   "about": {
     "heading": "about",
-    "paragraphs": [
-      "I'm a teacher who designs and builds educational technology. After years in the classroom, I started making the tools I always wished I had — software that targets the specific things learners struggle with, and gets out of the teacher's way.",
-      "I work across the whole stack: pedagogy, interaction design, and code. Each project starts from a real classroom problem and ends as something children actually want to use.",
-      "Step through the door and take a look around the classroom."
-    ]
+    "blocks": [
+      "11 years designing playful, hands-on learning in the classroom taught me what rich learning experiences look like and today's EdTech has a long way to go. After years of waiting for truly innovative digital learning to arrive on my students' laptops, I decided to go build it myself.",
+      "I got a master's in EdTech from Harvard and a great job designing learning games. Since then I've led the design of 27 innovative games, designed a suite of 9 best-in-class accessibility features, reached more than 2 million K–12 students, and supported 174,000+ educators in 7,400+ schools."
+    ],
+    "image": ""
   },
   "portfolio": {
     "heading": "portfolio",
@@ -52,13 +45,10 @@
       {
         "slug": "treasure-box",
         "title": "TREASURE BOX",
-        "blurb": "Learners solve a huge variety of math tasks using an innovative place value modeling tool.",
-        "tags": ["Place value", "Math modeling", "Interaction design"],
-        "year": "2025",
-        "role": "Design & development",
+        "subtitle": "A suite of best-in-class math games that reinvent place value learning",
+        "details": "Lead Designer | MIND Education | 2022 - 2024",
         "overview": [
-          "Treasure Box reimagines place value as something you can pick up, group, and trade. Learners build numbers physically inside the app and solve a wide range of math tasks using a single, consistent mental model.",
-          "The tool grows with the learner — the same interface that introduces tens and ones scales up to decimals and operations, so the underlying idea never has to be re-taught."
+          "Treasure Box is a suite of 6 learning games I designed for ST Math. Going beyond math tools that merely quiz students on place value, carrying, and borrowing as abstract concepts, Treasure Box lets students concretely compose, decompose, and regroup numbers with unique digital manipulatives designed from the ground up to teach these concepts. Spanning 3rd–6th grade Common Core and Texas standards, it remains the largest game development effort in ST Math's history, and is currently played by more than a million students every school year."
         ],
         "image": "https://img.youtube.com/vi/AZBvvtajFcA/maxresdefault.jpg",
         "youtubeId": "AZBvvtajFcA",
@@ -67,10 +57,9 @@
       {
         "slug": "memory-metro",
         "title": "MEMORY METRO",
-        "blurb": "Unique math practice + working memory training game. Solo developed with Claude Code.",
-        "tags": ["Working memory", "Math fluency", "Game design"],
-        "year": "2025",
-        "role": "Solo design & development",
+        "subtitle": "(coming soon!)",
+        "details": "",
+        "comingSoon": true,
         "overview": [
           "Memory Metro blends math fluency practice with genuine working-memory training. Players route trains through a growing transit map while holding and updating numbers in their head — the difficulty adapts to keep each learner at the edge of their capacity.",
           "Designed and built solo with Claude Code, from the game loop and difficulty model down to the art direction."
