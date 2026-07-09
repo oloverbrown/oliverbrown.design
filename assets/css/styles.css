@@ -296,7 +296,7 @@ a { color: inherit; }
 .piece__blurb {
   font-size: 1.3rem;
   font-weight: 400;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.75rem;
 }
 
 .piece__details {
