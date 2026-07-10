@@ -34,8 +34,8 @@
   "about": {
     "heading": "about",
     "blocks": [
-      "11 years designing playful, hands-on learning in the classroom taught me what rich learning experiences look like and today's EdTech has a long way to go. After years of waiting for truly innovative digital learning to arrive on my students' laptops, I decided to go build it myself.",
-      "I got a master's in EdTech from Harvard and a great job designing learning games. Since then I've led the design of 27 innovative games, designed a suite of 9 best-in-class accessibility features, reached more than 2 million K–12 students, and supported 174,000+ educators in 7,400+ schools."
+      { "text": "11 years designing playful, hands-on learning as a classroom teacher taught me what rich learning experiences look like and today's EdTech has a long way to go. After years of waiting for truly innovative digital learning to arrive on my students' laptops, I decided to go build it myself.", "highlight": "classroom teacher" },
+      { "text": "I got a master's in EdTech from Harvard and a great job as a learning game designer. Since then I've led the design of 27 innovative games, designed a suite of 9 best-in-class accessibility features, reached more than 2 million K–12 students, and supported 174,000+ educators in 7,400+ schools.", "highlight": "learning game designer" }
     ],
     "image": ""
   },
@@ -50,6 +50,7 @@
         "overview": [
           "Treasure Box is a suite of 6 learning games I designed for ST Math. Going beyond math tools that merely quiz students on place value, carrying, and borrowing as abstract concepts, Treasure Box lets students concretely compose, decompose, and regroup numbers with unique digital manipulatives designed from the ground up to teach these concepts. Spanning 3rd–6th grade Common Core and Texas standards, it remains the largest game development effort in ST Math's history, and is currently played by more than a million students every school year."
         ],
+        "disclosures": "Treasure Box art by Pamela Tseng. Video music: \"drunken sailors\" by ALKAKRAB, used with permission. Treasure Box was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Treasure Box belong to MIND Education.",
         "image": "https://img.youtube.com/vi/AZBvvtajFcA/maxresdefault.jpg",
         "youtubeId": "AZBvvtajFcA",
         "video": ""
@@ -57,14 +58,40 @@
       {
         "slug": "memory-metro",
         "title": "MEMORY METRO",
-        "subtitle": "(coming soon!)",
-        "details": "",
-        "comingSoon": true,
+        "subtitle": "A unique math + working memory game prototype solo developed with Claude Code",
+        "details": "Solo Designer & Developer | MIND Education | 2026",
+        "heroLabel": "playable game coming soon",
         "overview": [
-          "Memory Metro blends math fluency practice with genuine working-memory training. Players route trains through a growing transit map while holding and updating numbers in their head — the difficulty adapts to keep each learner at the edge of their capacity.",
-          "Designed and built solo with Claude Code, from the game loop and difficulty model down to the art direction."
+          "This unique unpublished prototype, solo designed and developed with Claude Code, has two learning goals: build math fact fluency and strengthen working memory. Avoiding visual and thematic complexity, the design uses a small number of elegant, intuitive mechanics to generate a wide range of levels full of discovery, surprise, and humor, while precisely titrating both mathematical and working-memory difficulty as students progress. The result is a compact but expressive design system that reflects my focused approach to learning game design."
         ],
+        "disclosures": "Memory Metro is an unpublished prototype I designed and developed solo during my time at MIND Education. It is shared here for portfolio purposes only and is not an official or released MIND Education product.",
         "image": "",
+        "video": ""
+      },
+      {
+        "slug": "greenfield-game",
+        "title": "THE GREENFIELD GAME",
+        "subtitle": "A classroom simulation where students run a small town and make decisions about economics, government, and infrastructure",
+        "details": "Teacher & Curriculum Designer | Greenfield Center School | 2015",
+        "overview": [
+          "The Greenfield Game is a classroom learning game iteratively developed over five years of my time as a 2nd/3rd grade classroom teacher at Greenfield Center School. The project is designed to answer the grade-appropriate questions: \"What is a town?\" and \"How do towns work?\" First students visit key places in town and then co-create a simulation of how the people, places, and jobs that they visited interconnect. In the course of the game students make individual and collective decisions about economics, government, infrastructure, and social issues."
+        ],
+        "disclosures": "Music used in this video: \"Cape Cod Kwassa Kwassa\" by Vampire Weekend, \"Bizness\" by Tune-Yards, and \"No Intention\" by Dirty Projectors. This video was created for an in-school museum installation and is shared here for portfolio purposes only. No copyright infringement is intended, and I do not hold a license for this music.",
+        "vimeoId": "502330240",
+        "image": "Greenfield_game_thumbnail.jpg",
+        "video": ""
+      },
+      {
+        "slug": "migration-data-poetry",
+        "title": "MIGRATION DATA POETRY PROJECT",
+        "subtitle": "A whole-school project combining migration data and poetry to explore the complex reality of international migration",
+        "details": "Teacher & Curriculum Designer | Greenfield Center School | 2019",
+        "overview": [
+          "The Migration Data Poetry Project is an interdisciplinary, whole-school project I designed as a classroom teacher at the Greenfield Center School. The project attempts to answer questions about who today's migrants are, where they come from, migrate to, and why, without reducing their stories to economic trends and simplistic tropes. Using data from the U.N. International Migration Report, I generated poem prompts that invited students from across the school to imagine the unique stories of individual migrants. The result was more than 100 poems exploring the diverse, multi-faceted reality of international migration."
+        ],
+        "disclosures": "",
+        "vimeoId": "497056564",
+        "image": "migration_data_thumbnail.png",
         "video": ""
       }
     ]

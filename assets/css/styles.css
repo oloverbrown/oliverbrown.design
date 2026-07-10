@@ -185,6 +185,12 @@ a { color: inherit; }
 .door-glow { display: none; }
 
 
+/* ---------- About highlight ---------- */
+.about__highlight {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* ---------- About ---------- */
 #about { padding-bottom: 3rem; }
 
@@ -213,7 +219,7 @@ a { color: inherit; }
 .about__row {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 0.5fr 1fr;
+  grid-template-columns: 1fr 0.57fr 1fr;
   gap: 1.5rem;
   align-items: stretch;
 }
@@ -319,6 +325,18 @@ a { color: inherit; }
 .piece:hover .piece__more {
   background: #c49ef5;
   border-color: #c49ef5;
+}
+
+.piece__hero-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #DCB8FB;
+  font-size: 1.2rem;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /* Thumbnail with play button (matches the design mockups) */
@@ -463,6 +481,13 @@ a { color: inherit; }
 
 .piece-page .piece__details { text-align: center; font-size: 1rem; }
 
+.piece-page__body .piece-page__disclosures {
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.7;
+  margin-top: 1.5rem;
+}
+
 .piece-page__meta {
   display: flex;
   flex-wrap: wrap;
@@ -478,6 +503,7 @@ a { color: inherit; }
 }
 
 .piece-page__hero {
+  position: relative;
   aspect-ratio: 16 / 9;
   border-radius: 14px;
   overflow: hidden;

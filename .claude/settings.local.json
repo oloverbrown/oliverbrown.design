@@ -24,7 +24,8 @@
       "Bash(python3 -m json.tool config.json)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8765/config.json)",
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --dump-dom --virtual-time-budget=2000 http://localhost:8765/)",
-      "Bash(curl -s \"http://localhost:8765/assets/css/styles.css\")"
+      "Bash(curl -s \"http://localhost:8765/assets/css/styles.css\")",
+      "Bash(python3 -m json.tool /Users/oliverbrown/Desktop/ob.design/config.json)"
     ]
   }
 }

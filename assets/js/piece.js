@@ -60,12 +60,24 @@ function renderHero(piece) {
       allowfullscreen: ''
     });
     hero.appendChild(iframe);
+  } else if (piece.vimeoId) {
+    const iframe = el('iframe', {
+      src: `https://player.vimeo.com/video/${piece.vimeoId}`,
+      title: piece.title,
+      frameborder: '0',
+      allow: 'autoplay; fullscreen; picture-in-picture',
+      allowfullscreen: ''
+    });
+    hero.appendChild(iframe);
   } else if (piece.video) {
     hero.appendChild(el('video', { src: piece.video, controls: '', playsinline: '' }));
   } else if (piece.image) {
     hero.appendChild(el('img', { src: piece.image, alt: piece.title }));
-  } else {
+  } else if (!piece.heroLabel) {
     hero.appendChild(el('span', { class: 'piece__play' }));
+  }
+  if (piece.heroLabel) {
+    hero.appendChild(el('div', { class: 'piece__hero-label', text: piece.heroLabel }));
   }
   return hero;
 }
@@ -93,6 +105,9 @@ function renderPiece(cfg, slug) {
 
   const body = el('div', { class: 'piece-page__body' });
   (piece.overview || []).forEach((p) => body.appendChild(el('p', { text: p })));
+  if (piece.disclosures) {
+    body.appendChild(el('p', { class: 'piece-page__disclosures', text: piece.disclosures }));
+  }
   root.appendChild(body);
 
   root.appendChild(el('a', { class: 'back-link back-link--bottom', href: '../index.html#portfolio', text: 'back to portfolio' }));

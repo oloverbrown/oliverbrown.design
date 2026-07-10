@@ -69,7 +69,18 @@ function renderAbout(cfg) {
   box.appendChild(el('h2', { text: cfg.about.heading }));
 
   const blocks = cfg.about.blocks || [];
-  const block = (text) => el('div', { class: 'content-box about__block' }, [el('p', { text })]);
+
+  const block = (item) => {
+    const text = typeof item === 'string' ? item : item.text;
+    const phrase = typeof item === 'object' && item.highlight;
+    const p = document.createElement('p');
+    if (phrase && text.includes(phrase)) {
+      p.innerHTML = text.replace(phrase, `<span class="about__highlight">${phrase}</span>`);
+    } else {
+      p.textContent = text;
+    }
+    return el('div', { class: 'content-box about__block' }, [p]);
+  };
 
   const row = el('div', { class: 'about__row' });
 
@@ -86,8 +97,11 @@ function thumb(piece) {
   const wrap = el('div', { class: 'piece__thumb' });
   if (piece.image) {
     wrap.appendChild(el('img', { src: piece.image, alt: piece.title, loading: 'lazy' }));
-  } else {
+  } else if (!piece.heroLabel) {
     wrap.appendChild(el('span', { class: 'piece__play' }));
+  }
+  if (piece.heroLabel) {
+    wrap.appendChild(el('div', { class: 'piece__hero-label', text: piece.heroLabel }));
   }
   return wrap;
 }
@@ -99,11 +113,7 @@ function renderPortfolio(cfg) {
   if (heading) heading.textContent = cfg.portfolio.heading;
 
   cfg.portfolio.pieces.forEach((piece) => {
-    const cardTag = piece.comingSoon ? 'div' : 'a';
-    const cardProps = piece.comingSoon
-      ? { class: 'piece piece--disabled' }
-      : { class: 'piece', href: `portfolio/${piece.slug}.html` };
-    const card = el(cardTag, cardProps, [
+    const card = el('a', { class: 'piece', href: `portfolio/${piece.slug}.html` }, [
       el('div', { class: 'piece__info' }, [
         el('h3', { class: 'piece__title', text: piece.title }),
         el('p', { class: 'piece__blurb', text: piece.subtitle }),
