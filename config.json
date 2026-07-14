@@ -1,16 +1,17 @@
 {
   "site": {
     "name": "oliverbrown.design",
-    "brand": "ob.design",
+    "brand": "Oliver Brown",
     "title": "oliverbrown.design",
     "description": "Oliver Brown builds targeted EdTech that makes learners into doers and lets teachers be teachers.",
     "font": "'Helvetica Neue', Helvetica, Arial, sans-serif"
   },
   "nav": [
-    { "label": "ob.design", "href": "#intro" },
+    { "label": "Oliver Brown", "href": "#intro" },
     { "label": "about", "href": "#about" },
     { "label": "portfolio", "href": "#portfolio" },
-    { "label": "contact", "href": "#contact" }
+    { "label": "contact", "href": "#contact" },
+    { "label": "resume", "href": "Oliver Brown Resume.pdf", "target": "_blank" }
   ],
   "theme": {
     "outside": {
@@ -99,9 +100,9 @@
   "contact": {
     "heading": "contact",
     "blurb": "Building something for learners or teachers? I'd love to hear about it.",
-    "email": "omackinnon@gmail.com",
+    "email": "oliver@oliverbrown.design",
     "links": [
-      { "label": "omackinnon@gmail.com", "href": "mailto:omackinnon@gmail.com" },
+      { "label": "oliver@oliverbrown.design", "href": "mailto:oliver@oliverbrown.design" },
       { "label": "linkedin.com/in/oliver--brown/", "href": "https://www.linkedin.com/in/oliver--brown/" }
     ]
   }

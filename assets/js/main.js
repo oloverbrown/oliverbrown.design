@@ -50,7 +50,7 @@ function renderNav(cfg, brandHref = '#intro', linkPrefix = '') {
   nav.appendChild(el('a', { class: 'nav__brand', href: linkPrefix + brand.href, text: brand.label }));
   nav.appendChild(
     el('nav', { class: 'nav__links' },
-      links.map((l) => el('a', { class: 'nav__link', href: linkPrefix + l.href, text: l.label }))
+      links.map((l) => el('a', { class: 'nav__link', href: linkPrefix + l.href, text: l.label, ...(l.target && { target: l.target, rel: 'noopener' }) }))
     )
   );
 }
@@ -84,7 +84,11 @@ function renderAbout(cfg) {
 
   const row = el('div', { class: 'about__row' });
 
-  row.appendChild(el('img', { class: 'about__photo', src: 'website_photo.png', alt: '' }));
+  const resumeHref = (cfg.nav || []).find((n) => n.label === 'resume')?.href || 'Oliver Brown Resume.pdf';
+  row.appendChild(el('div', { class: 'about__photo-col' }, [
+    el('img', { class: 'about__photo', src: 'website_photo.png', alt: '' }),
+    el('a', { class: 'about__resume-btn', href: resumeHref, target: '_blank', rel: 'noopener', text: 'my resume' }),
+  ]));
 
   if (blocks[0]) row.appendChild(block(blocks[0]));
   row.appendChild(el('div', { class: 'about__image' }));
