@@ -26,7 +26,7 @@
       "card": "#ffffff",
       "accent": "#6c3fa0"
     },
-    "childColors": ["#f4a9c2", "#bcd4f2", "#f6e6a0", "#c6e8c2", "#f6cfa6", "#d8c0ec"]
+    "childColors": ["#FDB5CB", "#FFBEBE", "#FFC6B4", "#ECBBEA", "#E8C2EF", "#DCB8FB", "#C7E4F9"]
   },
   "intro": {
     "leftLines": ["Hi", "I'm", "Oliver", "a", "senior", "learning", "game", "designer"],
@@ -34,9 +34,24 @@
   },
   "about": {
     "heading": "about",
+    "pillars": [
+      { "text": "Playful, Active Learning", "color": "#FFBEBE" },
+      { "text": "Content-Driven Design", "color": "#C7E4F9" },
+      { "text": "Deep, Conceptual Understanding", "color": "#FDB5CB" }
+    ],
     "blocks": [
       { "text": "11 years designing playful, hands-on learning as a classroom teacher taught me what rich learning experiences look like and today's EdTech has a long way to go. After years of waiting for truly innovative digital learning to arrive on my students' laptops, I decided to go build it myself.", "highlight": "classroom teacher" },
       { "text": "I got a master's in EdTech from Harvard and a great job as a learning game designer. Since then I've led the design of 27 innovative games, designed a suite of 9 best-in-class accessibility features, reached more than 2 million K–12 students, and supported 174,000+ educators in 7,400+ schools.", "highlight": "learning game designer" }
+    ],
+    "skills": [
+      "Product Management",
+      "Learning Game Design",
+      "Curriculum Design",
+      "Accessibility Design",
+      "User Research",
+      "Rapid Prototyping",
+      "User Testing",
+      "Standards Alignment"
     ],
     "image": ""
   },

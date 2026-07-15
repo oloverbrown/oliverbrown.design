@@ -68,6 +68,15 @@ function renderAbout(cfg) {
   if (!box) return;
   box.appendChild(el('h2', { text: cfg.about.heading }));
 
+  const pillars = cfg.about.pillars || [];
+  if (pillars.length) {
+    box.appendChild(el('div', { class: 'about__pillars' },
+      pillars.map((p) => el('div', { class: 'about__pillar', style: `--pillar-color: ${p.color}` }, [
+        el('span', { text: p.text }),
+      ]))
+    ));
+  }
+
   const blocks = cfg.about.blocks || [];
 
   const block = (item) => {
@@ -95,6 +104,17 @@ function renderAbout(cfg) {
   if (blocks[1]) row.appendChild(block(blocks[1]));
 
   box.appendChild(row);
+
+  const skills = cfg.about.skills || [];
+  if (skills.length) {
+    const colors = (cfg.theme && cfg.theme.childColors) || [];
+    box.appendChild(el('div', { class: 'about__skills' },
+      skills.map((s, i) => el('div', { class: 'about__skill', style: `--skill-color: ${colors[i % colors.length]}` }, [
+        el('span', { text: s }),
+      ]))
+    ));
+  }
+
 }
 
 function thumb(piece) {

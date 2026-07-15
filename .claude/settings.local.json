@@ -25,7 +25,19 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8765/config.json)",
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --dump-dom --virtual-time-budget=2000 http://localhost:8765/)",
       "Bash(curl -s \"http://localhost:8765/assets/css/styles.css\")",
-      "Bash(python3 -m json.tool /Users/oliverbrown/Desktop/ob.design/config.json)"
+      "Bash(python3 -m json.tool /Users/oliverbrown/Desktop/ob.design/config.json)",
+      "Bash(npx playwright *)",
+      "Bash(python3 -c \"import playwright\")",
+      "Bash(curl -s http://localhost:8765/ -o /dev/null -w \"%{http_code}\")",
+      "Bash(\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --headless=new --disable-gpu --window-size=1440,900 --screenshot=\"/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/2a567143-a7a0-4930-92c9-c6a6359153f9/scratchpad/nav.png\" \"http://localhost:8765\" --virtual-time-budget=5000)",
+      "Bash(python3)",
+      "Bash(file /Users/oliverbrown/Desktop/ob.design/*pillar* /Users/oliverbrown/Desktop/ob.design/sprites/*pillar*)",
+      "Bash(python3 -c ' *)",
+      "Bash(\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --headless=new --disable-gpu --window-size=1440,2400 --screenshot=\"/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/2a567143-a7a0-4930-92c9-c6a6359153f9/scratchpad/pillars.png\" \"http://localhost:8765/#about\" --virtual-time-budget=5000)",
+      "Bash(\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --headless=new --disable-gpu --window-size=1440,2600 --screenshot=\"/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/2a567143-a7a0-4930-92c9-c6a6359153f9/scratchpad/skills.png\" \"http://localhost:8765/#about\" --virtual-time-budget=5000)",
+      "Bash(sips -c 800 1440 --cropOffset 1750 0 \"/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/2a567143-a7a0-4930-92c9-c6a6359153f9/scratchpad/skills.png\" --out \"/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/2a567143-a7a0-4930-92c9-c6a6359153f9/scratchpad/skills_crop2.png\")",
+      "Bash(sips -c 700 1440 --cropOffset 1900 0 \"/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/2a567143-a7a0-4930-92c9-c6a6359153f9/scratchpad/skills.png\" --out \"/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/2a567143-a7a0-4930-92c9-c6a6359153f9/scratchpad/skills_crop3.png\")",
+      "Bash(\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --headless=new --disable-gpu --window-size=1440,4400 --screenshot=\"/private/tmp/claude-501/-Users-oliverbrown-Desktop-ob-design/2a567143-a7a0-4930-92c9-c6a6359153f9/scratchpad/full.png\" \"http://localhost:8765\" --virtual-time-budget=5000)"
     ]
   }
 }
