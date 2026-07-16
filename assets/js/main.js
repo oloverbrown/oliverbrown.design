@@ -72,9 +72,13 @@ function renderAbout(cfg) {
 
   const pillars = cfg.about.pillars || [];
   if (pillars.length) {
+    wrap.appendChild(el('div', { class: 'about__label', text: 'Design Pillars' }));
     wrap.appendChild(el('div', { class: 'about__pillars' },
       pillars.map((p) => el('div', { class: 'about__pillar', style: `--pillar-color: ${p.color}` }, [
-        el('span', { text: p.text }),
+        el('span', {}, [
+          p.prefix ? el('span', { class: 'about__pillar-prefix', text: `${p.prefix} ` }) : null,
+          p.text,
+        ]),
       ]))
     ));
   }
@@ -110,6 +114,7 @@ function renderAbout(cfg) {
   const skills = cfg.about.skills || [];
   if (skills.length) {
     const colors = (cfg.theme && cfg.theme.childColors) || [];
+    wrap.appendChild(el('div', { class: 'about__label about__label--skills', text: 'Key Skills' }));
     wrap.appendChild(el('div', { class: 'about__skills' },
       skills.map((s, i) => el('div', { class: 'about__skill', style: `--skill-color: ${colors[i % colors.length]}` }, [
         el('span', { text: s }),
@@ -127,7 +132,7 @@ function thumb(piece) {
   } else if (!piece.heroLabel) {
     wrap.appendChild(el('span', { class: 'piece__play' }));
   }
-  if (piece.heroLabel) {
+  if (piece.heroLabel && !piece.image) {
     wrap.appendChild(el('div', { class: 'piece__hero-label', text: piece.heroLabel }));
   }
   return wrap;

@@ -252,38 +252,54 @@ a { color: inherit; }
   transform: scale(1.07);
 }
 
-.about__pillar span { position: relative; }
+.about__pillar span { position: relative; white-space: pre-line; }
+
+.about__pillar-prefix { font-size: 1rem; }
 
 .about__row {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 0.57fr 1fr;
+  margin: 0 -1.2rem;
+  grid-template-columns: 1fr 0.52fr 1fr;
   gap: 1.5rem;
   align-items: stretch;
 }
 
 .about__photo-col {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 0.58rem;
+  bottom: 0.58rem;
   left: 50%;
   transform: translateX(-50%);
   width: 28%;
+  display: flex;
+  justify-content: center;
   z-index: 0;
 }
 
 .about__photo {
   display: block;
-  width: 100%;
-  height: auto;
+  height: 100%;
+  width: auto;
   pointer-events: none;
 }
+
+.about__label {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.7;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.45);
+}
+
+.about__label--skills { margin-top: 2rem; }
 
 .about__skills {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem 1.5rem;
-  margin-top: 2rem;
 }
 
 .about__skill {
@@ -315,13 +331,10 @@ a { color: inherit; }
   position: absolute;
   bottom: 0;
   left: 50%;
-  transform: translateX(-50%);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: calc((var(--maxw) - 4.5rem) / 4 * 0.75);
-  aspect-ratio: 543 / 158;
-  font-size: 1.3rem;
+  transform: translate(-50%, 50%);
+  display: inline-block;
+  font-size: 0.95rem;
+  padding: 0.45rem 1.1rem;
   border: 1px solid #DCB8FB;
   border-radius: 999px;
   color: #000;
@@ -339,7 +352,7 @@ a { color: inherit; }
   margin-bottom: 0;
   position: relative;
   z-index: 1;
-  padding: 1.75rem;
+  padding: 0.58rem 1.75rem;
 }
 
 .about__image { visibility: hidden; }
@@ -439,6 +452,8 @@ a { color: inherit; }
   white-space: nowrap;
   pointer-events: none;
 }
+
+.piece-page .piece__hero-label { font-size: 2.4rem; }
 
 /* Thumbnail with play button (matches the design mockups) */
 .piece__thumb {

@@ -49,6 +49,12 @@ function renderNav(cfg) {
   );
 }
 
+// Config asset paths are relative to the site root; sub-pages live in
+// portfolio/, so local paths need one level up.
+function asset(path) {
+  return /^(https?:)?\//.test(path) ? path : `../${path}`;
+}
+
 function renderHero(piece) {
   const hero = el('div', { class: 'piece-page__hero' });
   if (piece.youtubeId) {
@@ -70,9 +76,9 @@ function renderHero(piece) {
     });
     hero.appendChild(iframe);
   } else if (piece.video) {
-    hero.appendChild(el('video', { src: piece.video, controls: '', playsinline: '' }));
+    hero.appendChild(el('video', { src: asset(piece.video), controls: '', playsinline: '' }));
   } else if (piece.image) {
-    hero.appendChild(el('img', { src: piece.image, alt: piece.title }));
+    hero.appendChild(el('img', { src: asset(piece.image), alt: piece.title }));
   } else if (!piece.heroLabel) {
     hero.appendChild(el('span', { class: 'piece__play' }));
   }

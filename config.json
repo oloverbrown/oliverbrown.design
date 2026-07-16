@@ -29,15 +29,15 @@
     "childColors": ["#FDB5CB", "#FFBEBE", "#FFC6B4", "#ECBBEA", "#E8C2EF", "#DCB8FB", "#C7E4F9"]
   },
   "intro": {
-    "leftLines": ["Hi", "I'm", "Oliver", "a", "senior", "learning", "game", "designer"],
-    "rightLines": ["I", "craft", "playful", "targeted", "learning", "that", "pushes", "EdTech", "forward"]
+    "leftLines": ["Hi", "I'm", "Oliver", "a", "senior", "learning", "designer"],
+    "rightLines": ["I", "craft", "next-", "generation", "tools", "for", "playful", "classroom", "learning"]
   },
   "about": {
     "heading": "about",
     "pillars": [
-      { "text": "Playful, Active Learning", "color": "#FFBEBE" },
-      { "text": "Content-Driven Design", "color": "#C7E4F9" },
-      { "text": "Deep, Conceptual Understanding", "color": "#FDB5CB" }
+      { "text": "Playful, Active Experiences", "color": "#FFBEBE" },
+      { "text": "Custom-Built\nAround Content", "color": "#C7E4F9" },
+      { "prefix": "for", "text": "Deep, Conceptual Learning", "color": "#FDB5CB" }
     ],
     "blocks": [
       { "text": "11 years designing playful, hands-on learning as a classroom teacher taught me what rich learning experiences look like and today's EdTech has a long way to go. After years of waiting for truly innovative digital learning to arrive on my students' laptops, I decided to go build it myself.", "highlight": "classroom teacher" },
@@ -78,10 +78,10 @@
         "details": "Solo Designer & Developer | MIND Education | 2026",
         "heroLabel": "playable game coming soon",
         "overview": [
-          "This unique unpublished prototype, solo designed and developed with Claude Code, has two learning goals: build math fact fluency and strengthen working memory. Avoiding visual and thematic complexity, the design uses a small number of elegant, intuitive mechanics to generate a wide range of levels full of discovery, surprise, and humor, while precisely titrating both mathematical and working-memory difficulty as students progress. The result is a compact but expressive design system that reflects my focused approach to learning game design."
+          "This unpublished prototype, solo designed and developed with Claude Code for a project at MIND Education, has two learning goals: build math fact fluency and strengthen working memory. Avoiding visual and thematic complexity, the design uses a small number of elegant, intuitive mechanics to generate a wide range of levels full of discovery, surprise, and humor, while precisely titrating both mathematical and working-memory difficulty as students progress. The result is a compact but expressive design system that reflects my focused approach to learning game design."
         ],
         "disclosures": "Memory Metro is an unpublished prototype I designed and developed solo during my time at MIND Education. It is shared here for portfolio purposes only and is not an official or released MIND Education product.",
-        "image": "",
+        "image": "memory_metro_thumb.png",
         "video": ""
       },
       {

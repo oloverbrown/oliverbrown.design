@@ -74,7 +74,8 @@ Each entry in `portfolio.pieces` supports:
   "details":     "Role | Org | Year", // shown on subpage below title; omitted on card
   "overview":    ["paragraph", ...],  // subpage body text
   "disclosures": "...",               // small print below overview; omit or "" to hide
-  "heroLabel":   "coming soon",       // text centered over the hero/thumb; suppresses play button
+  "heroLabel":   "coming soon",       // text centered over the hero/thumb; suppresses play button.
+                                      // Main-page cards hide it when "image" is set; subpage always shows it.
   "youtubeId":   "VIDEO_ID",          // YouTube embed on subpage
   "vimeoId":     "VIDEO_ID",          // Vimeo embed on subpage
   "video":       "",                  // native <video> fallback (rarely used)
