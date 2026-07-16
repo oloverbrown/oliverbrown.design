@@ -68,9 +68,11 @@ function renderAbout(cfg) {
   if (!box) return;
   box.appendChild(el('h2', { text: cfg.about.heading }));
 
+  const wrap = el('div', { class: 'content-box about__box' });
+
   const pillars = cfg.about.pillars || [];
   if (pillars.length) {
-    box.appendChild(el('div', { class: 'about__pillars' },
+    wrap.appendChild(el('div', { class: 'about__pillars' },
       pillars.map((p) => el('div', { class: 'about__pillar', style: `--pillar-color: ${p.color}` }, [
         el('span', { text: p.text }),
       ]))
@@ -88,7 +90,7 @@ function renderAbout(cfg) {
     } else {
       p.textContent = text;
     }
-    return el('div', { class: 'content-box about__block' }, [p]);
+    return el('div', { class: 'about__block' }, [p]);
   };
 
   const row = el('div', { class: 'about__row' });
@@ -103,18 +105,19 @@ function renderAbout(cfg) {
   row.appendChild(el('div', { class: 'about__image' }));
   if (blocks[1]) row.appendChild(block(blocks[1]));
 
-  box.appendChild(row);
+  wrap.appendChild(row);
 
   const skills = cfg.about.skills || [];
   if (skills.length) {
     const colors = (cfg.theme && cfg.theme.childColors) || [];
-    box.appendChild(el('div', { class: 'about__skills' },
+    wrap.appendChild(el('div', { class: 'about__skills' },
       skills.map((s, i) => el('div', { class: 'about__skill', style: `--skill-color: ${colors[i % colors.length]}` }, [
         el('span', { text: s }),
       ]))
     ));
   }
 
+  box.appendChild(wrap);
 }
 
 function thumb(piece) {

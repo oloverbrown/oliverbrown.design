@@ -339,6 +339,7 @@ a { color: inherit; }
   margin-bottom: 0;
   position: relative;
   z-index: 1;
+  padding: 1.75rem;
 }
 
 .about__image { visibility: hidden; }
