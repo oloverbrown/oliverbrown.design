@@ -91,7 +91,7 @@ function renderHero(piece) {
     const scale = () => {
       const s = (hero.offsetWidth / nativeW) * 1.11;
       iframe.style.transform = `scale(${s})`;
-      hero.style.height = `${nativeH * s}px`;
+      hero.style.height = `${nativeH * s * 0.89}px`;
     };
     requestAnimationFrame(scale);
     window.addEventListener('resize', scale);
