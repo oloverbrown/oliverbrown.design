@@ -83,6 +83,8 @@ function renderAbout(cfg) {
     ));
   }
 
+  wrap.appendChild(el('div', { class: 'about__label about__label--bio', text: 'Bio' }));
+
   const blocks = cfg.about.blocks || [];
 
   const block = (item) => {

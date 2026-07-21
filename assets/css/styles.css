@@ -294,6 +294,7 @@ a { color: inherit; }
   border-bottom: 1px solid rgba(0, 0, 0, 0.45);
 }
 
+.about__label--bio { margin-top: 0.75rem; }
 .about__label--skills { margin-top: 2rem; }
 
 .about__skills {
@@ -630,6 +631,17 @@ a { color: inherit; }
   margin-bottom: 2.5rem;
 }
 
+.piece-page__hero--itchio {
+  aspect-ratio: unset;
+  display: block;
+}
+
+.piece-page__itchio-frame {
+  display: block;
+  transform-origin: top left;
+  border: none;
+}
+
 .piece-page__hero img,
 .piece-page__hero video,
 .piece-page__hero iframe {
@@ -638,6 +650,7 @@ a { color: inherit; }
   object-fit: cover;
   border: none;
 }
+
 
 .piece-page__body {
   max-width: 100%;

@@ -61,7 +61,7 @@
       {
         "slug": "treasure-box",
         "title": "TREASURE BOX",
-        "subtitle": "A suite of best-in-class math games with an innovative approach to place value learning",
+        "subtitle": "A suite of innovative, best-in-class place value learning games I designed for ST Math",
         "details": "Lead Designer | MIND Education | 2022 - 2024",
         "overview": [
           "Treasure Box is a suite of 6 learning games I designed for ST Math. Going beyond math tools that merely quiz students on place value, carrying, and borrowing as abstract concepts, Treasure Box lets students concretely compose, decompose, and regroup numbers with unique digital manipulatives designed from the ground up to teach these concepts. Spanning 3rd–6th grade Common Core and Texas standards, it remains the largest game development effort in ST Math's history, and is currently played by more than a million students every school year."
@@ -74,7 +74,7 @@
       {
         "slug": "memory-metro",
         "title": "MEMORY METRO",
-        "subtitle": "A unique math + working memory game prototype solo developed with Claude Code",
+        "subtitle": "A unique math + working memory game prototype developed solo with Claude Code for an ST Math spinoff product",
         "details": "Solo Designer & Developer | MIND Education | 2026",
         "heroLabel": "playable game coming soon",
         "overview": [
@@ -108,6 +108,20 @@
         "disclosures": "",
         "vimeoId": "497056564",
         "image": "migration_data_thumbnail.png",
+        "video": ""
+      },
+      {
+        "slug": "dress-rehearsal",
+        "title": "THE DRESS REHEARSAL DID NOT GO WELL",
+        "subtitle": "A puzzle game built in 48 hours for a game jam with the theme 'Roles Reversed'",
+        "details": "Designer & Developer | GMTK Game Jam | 2023",
+        "overview": [
+          "A puzzle game about mice and frogs putting on a play that refuses to go smoothly. Created in 48 hours for the 2023 GMTK Game Jam around the theme \"Roles Reversed,\" the game casts players as a stage-side puzzle solver: swap the masks worn by the actors to change how they move, and guide the show's two sweethearts to meet on the same square before the curtain call. I served as Lead Designer and Programmer, with art by Nathaniel Klein."
+        ],
+        "disclosures": "",
+        "itchioEmbed": "https://itch.io/embed-upload/8417833?color=370000",
+        "itchioSize": [1920, 1080],
+        "image": "dress_rehearsal_thumbnail.png",
         "video": ""
       }
     ]

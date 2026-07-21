@@ -75,6 +75,26 @@ function renderHero(piece) {
       allowfullscreen: ''
     });
     hero.appendChild(iframe);
+  } else if (piece.itchioEmbed) {
+    const [nativeW, nativeH] = piece.itchioSize || [1920, 1080];
+    hero.classList.add('piece-page__hero--itchio');
+    const iframe = el('iframe', {
+      class: 'piece-page__itchio-frame',
+      src: piece.itchioEmbed,
+      title: piece.title,
+      frameborder: '0',
+      allowfullscreen: ''
+    });
+    iframe.style.width = `${nativeW}px`;
+    iframe.style.height = `${nativeH}px`;
+    hero.appendChild(iframe);
+    const scale = () => {
+      const s = (hero.offsetWidth / nativeW) * 1.11;
+      iframe.style.transform = `scale(${s})`;
+      hero.style.height = `${nativeH * s}px`;
+    };
+    requestAnimationFrame(scale);
+    window.addEventListener('resize', scale);
   } else if (piece.video) {
     hero.appendChild(el('video', { src: asset(piece.video), controls: '', playsinline: '' }));
   } else if (piece.image) {
