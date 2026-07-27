@@ -50,14 +50,16 @@ assets/js/main.js       Landing renderer + door link
 assets/js/kids.js       Canvas "kids" simulation (see below)
 assets/js/piece.js      Portfolio sub-page renderer
 portfolio/*.html        One per piece (treasure-box, memory-metro,
-                          greenfield-game, migration-data-poetry)
+                          greenfield-game, migration-data-poetry,
+                          dress-rehearsal)
 sprites/                classroom_door.png, child.png (white silhouette, tinted at runtime)
 website_photo.png       Oliver's photo, shown in the about section
 pillar_backing.png      White silhouette behind each design pillar (CSS-mask tinted)
 skill_backing.png       White silhouette behind each skill (CSS-mask tinted)
 Oliver Brown Resume.pdf Resume; opened in a new tab by the nav + about buttons
-Greenfield_game_thumbnail.jpg   Main-page card thumbnail
-migration_data_thumbnail.png    Main-page card thumbnail
+Greenfield_game_thumbnail.jpg       Main-page card thumbnail
+migration_data_thumbnail.png        Main-page card thumbnail
+dress_rehearsal_thumbnail.png       Main-page card thumbnail
 designs/                Reference mockups only — NOT part of the site
 CNAME                   Custom domain for GitHub Pages
 ```
@@ -78,13 +80,21 @@ Each entry in `portfolio.pieces` supports:
                                       // Main-page cards hide it when "image" is set; subpage always shows it.
   "youtubeId":   "VIDEO_ID",          // YouTube embed on subpage
   "vimeoId":     "VIDEO_ID",          // Vimeo embed on subpage
+  "itchioEmbed": "https://itch.io/embed-upload/ID?color=XXXXXX",  // itch.io playable embed on subpage
+  "itchioSize":  [1920, 1080],        // native resolution of the itch.io game (default 1920×1080)
   "video":       "",                  // native <video> fallback (rarely used)
   "image":       "path/or/url",       // card thumbnail on main page
   "comingSoon":  true                 // DEPRECATED — use heroLabel instead
 }
 ```
 
-Hero priority: `youtubeId` → `vimeoId` → `video` → `image` → play-button placeholder.
+Hero priority: `youtubeId` → `vimeoId` → `itchioEmbed` → `video` → `image` → play-button placeholder.
+
+**itch.io embed scaling gotchas:**
+- The iframe is rendered at native size (`itchioSize`) then CSS-scaled down to fit the container width using `transform: scale(s)` with `transform-origin: top left`.
+- Scale factor is `(containerWidth / nativeW) * 1.11`; container height is set to `nativeH * s * 0.89` (the 1.11/0.89 multipliers were hand-tuned for the dress-rehearsal piece).
+- The initial `scale()` call is deferred with `requestAnimationFrame` so `hero.offsetWidth` is non-zero when it runs (the element must be in the DOM first).
+- `.piece-page__hero--itchio` overrides the hero's `display: flex` to `display: block` so the iframe sits at `(0,0)` before scaling — without this, flex centering offsets the 1920px iframe and the wrong quadrant of the game appears.
 
 ## About section
 
