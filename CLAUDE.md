@@ -49,9 +49,9 @@ assets/css/styles.css   Single stylesheet
 assets/js/main.js       Landing renderer + door link
 assets/js/kids.js       Canvas "kids" simulation (see below)
 assets/js/piece.js      Portfolio sub-page renderer
-portfolio/*.html        One per piece (treasure-box, memory-metro,
-                          greenfield-game, migration-data-poetry,
-                          dress-rehearsal)
+portfolio/*.html        One per piece (treasure-box, creative-decimal-division,
+                          variable-pipes, greenfield-game, migration-data-poetry,
+                          dress-rehearsal, memory-metro)
 sprites/                classroom_door.png, child.png (white silhouette, tinted at runtime)
 website_photo.png       Oliver's photo, shown in the about section
 pillar_backing.png      White silhouette behind each design pillar (CSS-mask tinted)
@@ -60,6 +60,9 @@ Oliver Brown Resume.pdf Resume; opened in a new tab by the nav + about buttons
 Greenfield_game_thumbnail.jpg       Main-page card thumbnail
 migration_data_thumbnail.png        Main-page card thumbnail
 dress_rehearsal_thumbnail.png       Main-page card thumbnail
+CDD_thumbnail.png                   Main-page card thumbnail (Creative Decimal Division)
+VP_thumbnail.png                    Main-page card thumbnail (Variable Pipes)
+memory_metro_thumb.png              Main-page card thumbnail (Memory Metro)
 designs/                Reference mockups only — NOT part of the site
 CNAME                   Custom domain for GitHub Pages
 ```

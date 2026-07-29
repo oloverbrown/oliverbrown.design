@@ -121,7 +121,14 @@
           if (o === this) continue;
           const dx = nx - o.x, dy = ny - o.y;
           const min = r + o.r;
-          if (dx * dx + dy * dy < min * min) { blocked = true; break; }
+          if (dx * dx + dy * dy < min * min) {
+            // Only block if the move pushes us further INTO the other kid.
+            // Moves that increase separation are allowed so overlapping
+            // clusters (e.g. after a resize clamps kids together) can resolve
+            // instead of freezing in a jam.
+            const cdx = this.x - o.x, cdy = this.y - o.y;
+            if (dx * dx + dy * dy < cdx * cdx + cdy * cdy) { blocked = true; break; }
+          }
         }
       }
 
