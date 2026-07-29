@@ -72,19 +72,6 @@
         "video": ""
       },
       {
-        "slug": "memory-metro",
-        "title": "MEMORY METRO",
-        "subtitle": "A unique math + working memory game prototype developed solo with Claude Code for an ST Math spinoff product",
-        "details": "Solo Designer & Developer | MIND Education | 2026",
-        "heroLabel": "playable game coming soon",
-        "overview": [
-          "This unpublished prototype, solo designed and developed with Claude Code for a project at MIND Education, has two learning goals: build math fact fluency and strengthen working memory. Avoiding visual and thematic complexity, the design uses a small number of elegant, intuitive mechanics to generate a wide range of levels full of discovery, surprise, and humor, while precisely titrating both mathematical and working-memory difficulty as students progress. The result is a compact but expressive design system that reflects my focused approach to learning game design."
-        ],
-        "disclosures": "Memory Metro is an unpublished prototype I designed and developed solo during my time at MIND Education. It is shared here for portfolio purposes only and is not an official or released MIND Education product.",
-        "image": "memory_metro_thumb.png",
-        "video": ""
-      },
-      {
         "slug": "creative-decimal-division",
         "title": "CREATIVE DECIMAL DIVISION",
         "subtitle": "A playful decimal division game designed for ST Math",
@@ -92,14 +79,21 @@
         "overview": [
           "I designed this fine-art-themed decimal division learning game for ST Math, a game-based, K-8, supplemental math product. This game targets 5th and 6th grade Common Core standards using an original, visual model of the partial product division strategy. Players explore decimal division in flexible, hands-on game modes, before solidifying their understanding in number and algorithm-based modes."
         ],
-        "disclosures": "Treasure Box art by Pamela Tseng. Creative Decimal Division was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Creative Decimal Division belong to MIND Education.",
+        "disclosures": "Creative Decimal Division art by Pamela Tseng. Creative Decimal Division was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Creative Decimal Division belong to MIND Education.",
         "youtubeId": "kJDH0vdj82o",
         "image": "CDD_thumbnail.png"
       },
       {
         "slug": "variable-pipes",
         "title": "VARIABLE PIPES",
-        "heroLabel": "coming soon"
+        "subtitle": "A game that explores variable substitution, and true and false solution sets designed for ST Math.",
+        "details": "Lead Designer | MIND Education | 2024",
+        "overview": [
+          "I designed this learning game about variables, expressions, equations, and inequalities for ST Math, a game-based, K-8, supplemental math product. The game targets 6th grade Common Core (CC) standards and allows learners to playfully interact with multi-variable expressions, equations, and inequalities. Through these interactions, learners build a conceptual understanding of variable substitution, true and false equations and inequalities, and solution sets."
+        ],
+        "disclosures": "Variable Pipes art by Joel Conklin. Variable Pipes was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Variable Pipes belong to MIND Education.",
+        "youtubeId": "2y4bNwc2HNw",
+        "image": "VP_thumbnail.png"
       },
       {
         "slug": "greenfield-game",
@@ -139,6 +133,19 @@
         "itchioEmbed": "https://itch.io/embed-upload/8417833?color=370000",
         "itchioSize": [1920, 1080],
         "image": "dress_rehearsal_thumbnail.png",
+        "video": ""
+      },
+      {
+        "slug": "memory-metro",
+        "title": "MEMORY METRO",
+        "subtitle": "A unique math + working memory game prototype developed solo with Claude Code for an ST Math spinoff product",
+        "details": "Solo Designer & Developer | MIND Education | 2026",
+        "heroLabel": "playable game coming soon",
+        "overview": [
+          "This unpublished prototype, solo designed and developed with Claude Code for a project at MIND Education, has two learning goals: build math fact fluency and strengthen working memory. Avoiding visual and thematic complexity, the design uses a small number of elegant, intuitive mechanics to generate a wide range of levels full of discovery, surprise, and humor, while precisely titrating both mathematical and working-memory difficulty as students progress. The result is a compact but expressive design system that reflects my focused approach to learning game design."
+        ],
+        "disclosures": "Memory Metro is an unpublished prototype I designed and developed solo during my time at MIND Education. It is shared here for portfolio purposes only and is not an official or released MIND Education product.",
+        "image": "memory_metro_thumb.png",
         "video": ""
       }
     ]
