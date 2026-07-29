@@ -87,7 +87,14 @@
       {
         "slug": "creative-decimal-division",
         "title": "CREATIVE DECIMAL DIVISION",
-        "heroLabel": "coming soon"
+        "subtitle": "A playful decimal division game designed for ST Math",
+        "details": "Lead Designer | MIND Education | 2023",
+        "overview": [
+          "I designed this fine-art-themed decimal division learning game for ST Math, a game-based, K-8, supplemental math product. This game targets 5th and 6th grade Common Core standards using an original, visual model of the partial product division strategy. Players explore decimal division in flexible, hands-on game modes, before solidifying their understanding in number and algorithm-based modes."
+        ],
+        "disclosures": "Treasure Box art by Pamela Tseng. Creative Decimal Division was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Creative Decimal Division belong to MIND Education.",
+        "youtubeId": "kJDH0vdj82o",
+        "image": "CDD_thumbnail.png"
       },
       {
         "slug": "variable-pipes",
