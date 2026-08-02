@@ -29,7 +29,7 @@
     "childColors": ["#FDB5CB", "#FFBEBE", "#FFC6B4", "#ECBBEA", "#E8C2EF", "#DCB8FB", "#C7E4F9"]
   },
   "intro": {
-    "leftLines": ["Hi", "I'm", "Oliver", "a", "senior", "learning", "designer"],
+    "leftLines": ["Hi", "I'm", "Oliver", "a", "senior", "interactive", "learning", "designer"],
     "rightLines": ["I", "craft", "next-", "generation", "tools", "for", "playful", "classroom", "learning"]
   },
   "about": {

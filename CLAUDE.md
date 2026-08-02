@@ -143,6 +143,10 @@ obstacle, mouse-move attraction, click = strong sustained seek then scatter,
 y-sorted draw order each frame.
 
 Gotchas:
+- **Collision escape valve:** `Kid.step()` only blocks a move that pushes *further into* an
+  overlapping neighbour — moves that increase separation are allowed. This prevents kids from
+  freezing in a vertical pile after a window resize clamps multiple kids to the same edge.
+  Don't revert this to a simple "any overlap = blocked" check.
 - Sprite `SPRITE_SRC` is resolved **relative to index.html** (`sprites/child.png`),
   not to the JS file.
 - The kid palette is **hardcoded** as `KID_COLORS` in kids.js; `theme.childColors`
