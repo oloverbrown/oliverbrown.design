@@ -72,6 +72,20 @@
         "video": ""
       },
       {
+        "slug": "memory-metro",
+        "title": "MEMORY METRO",
+        "subtitle": "A unique math + working memory game prototype developed solo with Claude Code for an ST Math spinoff product",
+        "details": "Solo Designer & Developer | MIND Education | 2026",
+        "heroLabel": "click to play",
+        "heroLink": "../mm_4d.html",
+        "overview": [
+          "This unpublished prototype, solo designed and developed with Claude Code for a project at MIND Education, has two learning goals: build math fact fluency and strengthen working memory. Avoiding visual and thematic complexity, the design uses a small number of elegant, intuitive mechanics to generate a wide range of levels full of discovery, surprise, and humor, while precisely titrating both mathematical and working-memory difficulty as students progress. The result is a compact but expressive design system that reflects my focused approach to learning game design."
+        ],
+        "disclosures": "Memory Metro is an unpublished prototype I designed and developed solo during my time at MIND Education. It is shared here for portfolio purposes only and is not an official or released MIND Education product.",
+        "image": "memory_metro_thumb.png",
+        "video": ""
+      },
+      {
         "slug": "creative-decimal-division",
         "title": "CREATIVE DECIMAL DIVISION",
         "subtitle": "A playful, visual decimal division game designed for ST Math",
@@ -133,19 +147,6 @@
         "itchioEmbed": "https://itch.io/embed-upload/8417833?color=370000",
         "itchioSize": [1920, 1080],
         "image": "dress_rehearsal_thumbnail.png",
-        "video": ""
-      },
-      {
-        "slug": "memory-metro",
-        "title": "MEMORY METRO",
-        "subtitle": "A unique math + working memory game prototype developed solo with Claude Code for an ST Math spinoff product",
-        "details": "Solo Designer & Developer | MIND Education | 2026",
-        "heroLabel": "playable game coming soon",
-        "overview": [
-          "This unpublished prototype, solo designed and developed with Claude Code for a project at MIND Education, has two learning goals: build math fact fluency and strengthen working memory. Avoiding visual and thematic complexity, the design uses a small number of elegant, intuitive mechanics to generate a wide range of levels full of discovery, surprise, and humor, while precisely titrating both mathematical and working-memory difficulty as students progress. The result is a compact but expressive design system that reflects my focused approach to learning game design."
-        ],
-        "disclosures": "Memory Metro is an unpublished prototype I designed and developed solo during my time at MIND Education. It is shared here for portfolio purposes only and is not an official or released MIND Education product.",
-        "image": "memory_metro_thumb.png",
         "video": ""
       }
     ]

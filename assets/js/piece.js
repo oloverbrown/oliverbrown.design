@@ -103,7 +103,10 @@ function renderHero(piece) {
     hero.appendChild(el('span', { class: 'piece__play' }));
   }
   if (piece.heroLabel) {
-    hero.appendChild(el('div', { class: 'piece__hero-label', text: piece.heroLabel }));
+    const label = piece.heroLink
+      ? el('a', { class: 'piece__hero-label', href: piece.heroLink, target: '_blank', rel: 'noopener', text: piece.heroLabel })
+      : el('div', { class: 'piece__hero-label', text: piece.heroLabel });
+    hero.appendChild(label);
   }
   return hero;
 }

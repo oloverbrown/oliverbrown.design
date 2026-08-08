@@ -452,6 +452,11 @@ a { color: inherit; }
   font-weight: 500;
   white-space: nowrap;
   pointer-events: none;
+  text-decoration: none;
+}
+a.piece__hero-label {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .piece-page .piece__hero-label { font-size: 2.4rem; }
