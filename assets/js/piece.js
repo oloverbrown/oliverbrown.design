@@ -98,7 +98,14 @@ function renderHero(piece) {
   } else if (piece.video) {
     hero.appendChild(el('video', { src: asset(piece.video), controls: '', playsinline: '' }));
   } else if (piece.image) {
-    hero.appendChild(el('img', { src: asset(piece.image), alt: piece.title }));
+    const img = el('img', { src: asset(piece.image), alt: piece.title });
+    if (piece.heroLink) {
+      const link = el('a', { href: piece.heroLink, target: '_blank', rel: 'noopener' });
+      link.appendChild(img);
+      hero.appendChild(link);
+    } else {
+      hero.appendChild(img);
+    }
   } else if (!piece.heroLabel) {
     hero.appendChild(el('span', { class: 'piece__play' }));
   }
