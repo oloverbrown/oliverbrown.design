@@ -39,6 +39,8 @@ function applyTheme(cfg) {
 function renderNav(cfg) {
   const nav = document.getElementById('nav');
   if (!nav) return;
+  // Black bar as its own layer; nav text sits on top.
+  document.body.appendChild(el('div', { class: 'nav__bg' }));
   const [brand, ...links] = cfg.nav;
   // From a sub-page, links point back to the landing page sections.
   nav.appendChild(el('a', { class: 'nav__brand', href: `../index.html${brand.href}`, text: brand.label }));
@@ -131,20 +133,25 @@ function renderPiece(cfg, slug) {
   document.title = `${piece.title} — ${cfg.site.brand}`;
 
   root.appendChild(el('a', { class: 'back-link', href: '../index.html#portfolio', text: 'back to portfolio' }));
-  root.appendChild(el('h1', { class: 'piece-page__title', text: piece.title }));
+
+  const box = el('div', { class: 'content-box piece-page__content-box' });
+
+  box.appendChild(el('h1', { class: 'piece-page__title', text: piece.title }));
 
   if (piece.details) {
-    root.appendChild(el('p', { class: 'piece__details', text: piece.details }));
+    box.appendChild(el('p', { class: 'piece__details', text: piece.details }));
   }
 
-  root.appendChild(renderHero(piece));
+  box.appendChild(renderHero(piece));
 
   const body = el('div', { class: 'piece-page__body' });
   (piece.overview || []).forEach((p) => body.appendChild(el('p', { text: p })));
   if (piece.disclosures) {
     body.appendChild(el('p', { class: 'piece-page__disclosures', text: piece.disclosures }));
   }
-  root.appendChild(body);
+  box.appendChild(body);
+
+  root.appendChild(box);
 
   root.appendChild(el('a', { class: 'back-link back-link--bottom', href: '../index.html#portfolio', text: 'back to portfolio' }));
 }

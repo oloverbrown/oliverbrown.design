@@ -7,7 +7,6 @@
 (() => {
   'use strict';
 
-  // Resolved relative to the HTML page (index.html lives at the site root).
   const SPRITE_SRC = 'sprites/child.png';
 
   // Colours a kid is randomly assigned on spawn.
@@ -26,6 +25,7 @@
   const IDLE_MIN = 0.5, IDLE_MAX = 3;   // seconds per idle state (halved)
   const MOVE_MIN = 1,  MOVE_MAX = 6;    // seconds per movement state
   const SPEED_MIN = 1, SPEED_MAX = 7;   // px per frame at the peak of a move
+  const LOWER_SPRITE_W = 62;            // 69 × 0.9
 
   const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -54,20 +54,30 @@
 
   /* ---------- Kid ---------- */
   class Kid {
-    constructor(region) {
+    // atEdge  — place on the canvas perimeter instead of randomly inside
+    // skipPlace — skip all placement (used when restoring from saved state)
+    constructor(region, atEdge = false, skipPlace = false) {
       this.region = region;
-      this.sprite = region.tints[KID_COLORS[(Math.random() * KID_COLORS.length) | 0]];
-      this.dir = rand(0, TWO_PI);          // 1..360deg, random
-      this.speed = 0;                      // starts at zero
+      if (region.cycleColors) {
+        this.ci = region.colorIdx % KID_COLORS.length;
+        region.colorIdx++;
+      } else {
+        this.ci = (Math.random() * KID_COLORS.length) | 0;
+      }
+      this.sprite = region.tints[KID_COLORS[this.ci]];
+      this.dir = rand(0, TWO_PI);
+      this.speed = 0;
       this.targetSpeed = 0;
-      this.boost = 0;                      // mouse-driven speed, decays each frame
-      this.r = region.spriteW / 2;         // boundary radius = ½ sprite width
+      this.boost = 0;
+      this.r = region.spriteW / 2;
       this.state = region.noIdle ? 'move' : 'idle';
       this.stateStart = performance.now() / 1000;
       this.stateDur = region.noIdle ? rand(MOVE_MIN, MOVE_MAX) : rand(IDLE_MIN, IDLE_MAX);
       if (region.noIdle) this.targetSpeed = rand(SPEED_MIN, SPEED_MAX);
-      // Place inside the region, not overlapping existing kids.
-      this.placeWithoutOverlap();
+      if (!skipPlace) {
+        if (atEdge) this.placeAtEdge();
+        else this.placeWithoutOverlap();
+      }
     }
 
     placeWithoutOverlap() {
@@ -83,9 +93,30 @@
         }
         if (ok) return;
       }
-      // Give up gracefully — just clamp inside.
       this.x = Math.min(Math.max(this.x, r), w - r);
       this.y = Math.min(Math.max(this.y, r), h - r);
+    }
+
+    // Place kid just outside the visible viewport, uniformly along the
+    // perimeter of the extended canvas so they all walk in from the edges.
+    placeAtEdge() {
+      const { w, h } = this.region;
+      const r = this.r;
+      const perim = 2 * (w + h);
+      const pos = rand(0, perim);
+      if (pos < w) {
+        this.x = r + (pos / w) * (w - 2 * r);
+        this.y = r;
+      } else if (pos < w + h) {
+        this.x = w - r;
+        this.y = r + ((pos - w) / h) * (h - 2 * r);
+      } else if (pos < 2 * w + h) {
+        this.x = r + ((pos - w - h) / w) * (w - 2 * r);
+        this.y = h - r;
+      } else {
+        this.x = r;
+        this.y = r + ((pos - 2 * w - h) / h) * (h - 2 * r);
+      }
     }
 
     updateState(now) {
@@ -152,17 +183,19 @@
 
   /* ---------- Region ---------- */
   class Region {
-    constructor({ canvas, tints, spriteW, ratio, measure, noIdle = false, clickable = true }) {
+    constructor({ canvas, tints, spriteW, ratio, measure, noIdle = false, clickable = true, cycleColors = false }) {
       this.canvas = canvas;
       this.ctx = canvas.getContext('2d');
       this.tints = tints;
       this.spriteW = spriteW;
       this.spriteH = spriteW * ratio;
-      this.measure = measure;       // () => {left, top, width, height} in page px
+      this.measure = measure;
       this.noIdle = noIdle;
       this.clickable = clickable;
+      this.cycleColors = cycleColors;
+      this.colorIdx = 0;
       this.kids = [];
-      this.seek = null;             // active click-seek target, if any
+      this.seek = null;
       this.w = 0; this.h = 0;
       this.resize();
     }
@@ -186,8 +219,31 @@
       this.kids.forEach((k) => k.clampInside());
     }
 
-    spawn(n) {
-      for (let i = 0; i < n; i++) this.kids.push(new Kid(this));
+    spawn(n, atEdge = false) {
+      for (let i = 0; i < n; i++) this.kids.push(new Kid(this, atEdge));
+    }
+
+    // Restore kids from a saved state array without random placement.
+    restoreFromState(state) {
+      const now = performance.now() / 1000;
+      for (const s of state) {
+        const kid = new Kid(this, false, true); // skipPlace = true
+        kid.x = s.x;
+        kid.y = s.y;
+        kid.dir = s.dir;
+        if (s.ci !== undefined) {
+          kid.ci = s.ci;
+          kid.sprite = this.tints[KID_COLORS[s.ci % KID_COLORS.length]];
+        }
+        // Restore movement state so kids keep moving rather than freezing.
+        kid.state = s.state || 'move';
+        kid.speed = s.speed ?? rand(SPEED_MIN, SPEED_MAX);
+        kid.targetSpeed = s.targetSpeed ?? kid.speed;
+        kid.stateDur = s.stateDur ?? rand(MOVE_MIN, MOVE_MAX);
+        kid.stateStart = now - (s.stateElapsed ?? 0);
+        kid.clampInside();
+        this.kids.push(kid);
+      }
     }
 
     // Convert a page (client) point into region-local coordinates.
@@ -202,14 +258,13 @@
         const dx = x - k.x, dy = y - k.y;
         if (dx * dx + dy * dy < MOUSE_RADIUS * MOUSE_RADIUS) {
           k.dir += angDiff(k.dir, Math.atan2(dy, dx)) * ATTRACT;
-          k.boost = Math.max(k.boost, MOVE_BOOST);  // speed nudge from nearby movement
+          k.boost = Math.max(k.boost, MOVE_BOOST);
         }
       }
     }
 
     turnToward(clientX, clientY) {
       const { x, y } = this.toLocal(clientX, clientY);
-      // A click sets a strong seek target that all kids chase for a while.
       this.seek = { x, y, t: CLICK_SEEK_TIME };
       for (const k of this.kids) {
         k.dir = Math.atan2(y - k.y, x - k.x);
@@ -221,7 +276,6 @@
       if (this.seek) {
         this.seek.t -= dt;
         if (this.seek.t <= 0) {
-          // Scatter: flip each kid away from the target.
           for (const k of this.kids) {
             k.dir = Math.atan2(k.y - this.seek.y, k.x - this.seek.x);
             k.boost = Math.max(k.boost, SPEED_MAX);
@@ -232,7 +286,6 @@
       for (const k of this.kids) {
         k.updateState(now);
         if (this.seek) {
-          // Keep steering hard toward the click point and hold max speed.
           const target = Math.atan2(this.seek.y - k.y, this.seek.x - k.x);
           k.dir += angDiff(k.dir, target) * CLICK_STEER;
           k.boost = CLICK_SPEED;
@@ -253,49 +306,103 @@
     }
   }
 
+  /* ---------- State persistence ---------- */
+  function saveKidState(region) {
+    const now = performance.now() / 1000;
+    try {
+      sessionStorage.setItem('kids-lower', JSON.stringify(
+        region.kids.map((k) => ({
+          x: k.x, y: k.y, dir: k.dir, ci: k.ci,
+          state: k.state,
+          speed: k.speed,
+          targetSpeed: k.targetSpeed,
+          stateDur: k.stateDur,
+          stateElapsed: now - k.stateStart,
+        }))
+      ));
+    } catch (e) {}
+  }
+
+  function loadKidState() {
+    try {
+      const raw = sessionStorage.getItem('kids-lower');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  /* ---------- Shared lower region setup ---------- */
+  function makeLowerRegion(tints, ratio) {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'kids-canvas kids-canvas--lower';
+    document.body.appendChild(canvas);
+    return new Region({
+      canvas, tints, ratio,
+      spriteW: LOWER_SPRITE_W,
+      cycleColors: true,
+      measure: () => ({
+        left: -LOWER_SPRITE_W,
+        top: -LOWER_SPRITE_W,
+        width:  document.documentElement.clientWidth  + 2 * LOWER_SPRITE_W,
+        height: document.documentElement.clientHeight + 2 * LOWER_SPRITE_W,
+      }),
+    });
+  }
+
   /* ---------- Bootstrap ---------- */
   function start(img) {
     const { map: tints, ratio } = buildTints(img);
     const regions = [];
+    const isSubpage = document.body.classList.contains('subpage');
 
-    // Door region — 7 kids on the pink rectangle behind the door.
-    const door = document.querySelector('.intro__door');
-    if (door) {
-      const canvas = document.createElement('canvas');
-      canvas.className = 'kids-canvas kids-canvas--door';
-      door.appendChild(canvas);
-      const region = new Region({
-        canvas, tints, ratio, spriteW: 69, noIdle: true, clickable: false,
-        measure: () => ({ left: 0, top: 0, width: canvas.clientWidth, height: canvas.clientHeight })
-      });
-      region.spawn(25);
-      regions.push(region);
+    // Door region — only on the main landing page.
+    if (!isSubpage) {
+      const door = document.querySelector('.intro__door');
+      if (door) {
+        const canvas = document.createElement('canvas');
+        canvas.className = 'kids-canvas kids-canvas--door';
+        door.appendChild(canvas);
+        const region = new Region({
+          canvas, tints, ratio, spriteW: 69, noIdle: true, clickable: false,
+          measure: () => ({ left: 0, top: 0, width: canvas.clientWidth, height: canvas.clientHeight })
+        });
+        region.spawn(25);
+        regions.push(region);
+      }
     }
 
-    // Lower region — 50 kids across the about→contact pink area.
-    const about = document.getElementById('about');
-    const contact = document.getElementById('contact');
-    if (about && contact) {
-      const canvas = document.createElement('canvas');
-      canvas.className = 'kids-canvas kids-canvas--lower';
-      document.body.appendChild(canvas);
-      const region = new Region({
-        canvas, tints, ratio, spriteW: 69,
-        measure: () => {
-          const a = about.getBoundingClientRect();
-          const c = contact.getBoundingClientRect();
-          const top = a.top + window.scrollY;
-          const bottom = c.bottom + window.scrollY;
-          return { left: 0, top, width: document.documentElement.clientWidth, height: bottom - top };
-        }
-      });
-      region.resize();
-      region.spawn(150);
-      regions.push(region);
-    }
+    // Lower region — runs on both the main page and portfolio sub-pages.
+    // Kid positions are saved to sessionStorage on navigation so they persist.
+    const lower = makeLowerRegion(tints, ratio);
+    lower.resize();
 
-    // Mouse interaction (read from the window so the no-pointer canvases
-    // don't have to receive events themselves).
+    const saved = loadKidState();
+    if (saved && saved.length > 0) {
+      lower.restoreFromState(saved);
+    } else {
+      // Fresh spawn: count scales to crowd density; kids start off-screen.
+      let count = 20;
+      const scroller = document.querySelector('main') || document.documentElement;
+      const about = document.getElementById('about');
+      const contact = document.getElementById('contact');
+      if (about && contact) {
+        const scrollTop = scroller.scrollTop;
+        const a = about.getBoundingClientRect();
+        const c = contact.getBoundingClientRect();
+        const oldHeight = (c.bottom + scrollTop) - (a.top + scrollTop);
+        const viewHeight = document.documentElement.clientHeight;
+        count = oldHeight > 0
+          ? Math.max(1, Math.round(150 * viewHeight / oldHeight))
+          : 150;
+        count += 20;
+      }
+      lower.spawn(count, true);
+    }
+    regions.push(lower);
+
+    // Save positions before leaving the page so they can be restored on the next.
+    window.addEventListener('pagehide', () => saveKidState(lower));
+
+    // Mouse interaction.
     window.addEventListener('mousemove', (e) => {
       regions.forEach((r) => r.attract(e.clientX, e.clientY));
     });
@@ -310,7 +417,6 @@
       });
     });
 
-    // Recompute geometry when layout can shift.
     const resizeAll = () => regions.forEach((r) => r.resize());
     window.addEventListener('resize', resizeAll);
     window.addEventListener('load', () => { resizeAll(); setTimeout(resizeAll, 400); });
@@ -330,10 +436,18 @@
   function init() {
     const img = new Image();
     img.onload = () => start(img);
-    img.onerror = () => console.error('kids: could not load sprite', SPRITE_SRC);
-    img.src = SPRITE_SRC;
+    img.onerror = () => console.error('kids: could not load sprite', img.src);
+    // Sprite path resolves relative to the HTML file; sub-pages live one dir deep.
+    img.src = document.body.classList.contains('subpage')
+      ? '../sprites/child.png'
+      : SPRITE_SRC;
   }
 
-  // Wait until main.js has populated the DOM so regions measure correctly.
-  document.addEventListener('ob:ready', init, { once: true });
+  // Main page: wait for ob:ready so region geometry is correct after render.
+  // Sub-pages: start on DOMContentLoaded (no ob:ready is dispatched there).
+  if (document.body.classList.contains('subpage')) {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    document.addEventListener('ob:ready', init, { once: true });
+  }
 })();

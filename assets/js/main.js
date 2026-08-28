@@ -46,6 +46,8 @@ function applyTheme(cfg) {
 function renderNav(cfg, brandHref = '#intro', linkPrefix = '') {
   const nav = document.getElementById('nav');
   if (!nav) return;
+  // Black bar as its own layer (below the kids); nav text stays on top.
+  document.body.appendChild(el('div', { class: 'nav__bg' }));
   const [brand, ...links] = cfg.nav;
   nav.appendChild(el('a', { class: 'nav__brand', href: linkPrefix + brand.href, text: brand.label }));
   nav.appendChild(
@@ -66,7 +68,9 @@ function renderIntro(cfg) {
 function renderAbout(cfg) {
   const box = document.getElementById('about-content');
   if (!box) return;
-  box.appendChild(el('h2', { text: cfg.about.heading }));
+  if (cfg.about.headline) {
+    box.appendChild(el('h1', { class: 'about__headline', text: cfg.about.headline }));
+  }
 
   const wrap = el('div', { class: 'content-box about__box' });
 
@@ -183,7 +187,6 @@ async function init() {
     window.__OBCONFIG__ = cfg;
     applyTheme(cfg);
     renderNav(cfg);
-    renderIntro(cfg);
     renderAbout(cfg);
     renderPortfolio(cfg);
     renderContact(cfg);
