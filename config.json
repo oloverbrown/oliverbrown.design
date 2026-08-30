@@ -74,7 +74,7 @@
       {
         "slug": "memory-metro",
         "title": "MEMORY METRO",
-        "subtitle": "A unique math + working memory game prototype developed solo with Claude Code for an ST Math spinoff product",
+        "subtitle": "A memory + math game prototype developed solo with Claude Code",
         "details": "Solo Designer & Developer | MIND Education | 2026",
         "heroLabel": "click to play",
         "heroLink": "../mm_2lvls.html",
@@ -84,30 +84,6 @@
         "disclosures": "Memory Metro is an unpublished prototype I designed and developed solo during my time at MIND Education. It is shared here for portfolio purposes only and is not an official or released MIND Education product.",
         "image": "memory_metro_thumb.png",
         "video": ""
-      },
-      {
-        "slug": "creative-decimal-division",
-        "title": "CREATIVE DECIMAL DIVISION",
-        "subtitle": "A playful, visual decimal division game designed for ST Math",
-        "details": "Lead Designer | MIND Education | 2023",
-        "overview": [
-          "I designed this fine-art-themed decimal division learning game for ST Math, a game-based, K-8, supplemental math product. This game targets 5th and 6th grade Common Core standards using an original, visual model of the partial product division strategy. Players explore decimal division in flexible, hands-on game modes, before solidifying their understanding in number and algorithm-based modes."
-        ],
-        "disclosures": "Creative Decimal Division art by Pamela Tseng. Creative Decimal Division was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Creative Decimal Division belong to MIND Education.",
-        "youtubeId": "kJDH0vdj82o",
-        "image": "CDD_thumbnail.png"
-      },
-      {
-        "slug": "variable-pipes",
-        "title": "VARIABLE PIPES",
-        "subtitle": "A game that explores variable substitution, and true and false solution sets designed for ST Math",
-        "details": "Lead Designer | MIND Education | 2024",
-        "overview": [
-          "I designed this learning game about variables, expressions, equations, and inequalities for ST Math, a game-based, K-8, supplemental math product. The game targets 6th grade Common Core (CC) standards and allows learners to playfully interact with multi-variable expressions, equations, and inequalities. Through these interactions, learners build a conceptual understanding of variable substitution, true and false equations and inequalities, and solution sets."
-        ],
-        "disclosures": "Variable Pipes art by Joel Conklin. Variable Pipes was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Variable Pipes belong to MIND Education.",
-        "youtubeId": "2y4bNwc2HNw",
-        "image": "VP_thumbnail.png"
       },
       {
         "slug": "greenfield-game",
@@ -123,19 +99,6 @@
         "video": ""
       },
       {
-        "slug": "migration-data-poetry",
-        "title": "MIGRATION DATA POETRY PROJECT",
-        "subtitle": "A whole-school project combining migration data and poetry to explore the complex reality of international migration",
-        "details": "Teacher & Curriculum Designer | Greenfield Center School | 2019",
-        "overview": [
-          "The Migration Data Poetry Project is an interdisciplinary, whole-school project I designed as a classroom teacher at the Greenfield Center School. The project attempts to answer questions about who today's migrants are, where they come from, migrate to, and why, without reducing their stories to economic trends and simplistic tropes. Using data from the U.N. International Migration Report, I generated poem prompts that invited students from across the school to imagine the unique stories of individual migrants. The result was more than 100 poems exploring the diverse, multi-faceted reality of international migration."
-        ],
-        "disclosures": "",
-        "vimeoId": "497056564",
-        "image": "migration_data_thumbnail.png",
-        "video": ""
-      },
-      {
         "slug": "dress-rehearsal",
         "title": "THE DRESS REHEARSAL DID NOT GO WELL",
         "subtitle": "A puzzle game built in 48 hours for a game jam with the theme 'Roles Reversed'",
@@ -148,6 +111,45 @@
         "itchioSize": [1920, 1080],
         "image": "dress_rehearsal_thumbnail.png",
         "video": ""
+      },
+      {
+        "slug": "variable-pipes",
+        "title": "VARIABLE PIPES",
+        "subtitle": "A game that explores variable substitution, and true and false solution sets designed for ST Math",
+        "details": "Lead Designer | MIND Education | 2024",
+        "overview": [
+          "I designed this learning game about variables, expressions, equations, and inequalities for ST Math, a game-based, K-8, supplemental math product. The game targets 6th grade Common Core (CC) standards and allows learners to playfully interact with multi-variable expressions, equations, and inequalities. Through these interactions, learners build a conceptual understanding of variable substitution, true and false equations and inequalities, and solution sets."
+        ],
+        "disclosures": "Variable Pipes art by Joel Conklin. Variable Pipes was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Variable Pipes belong to MIND Education.",
+        "youtubeId": "2y4bNwc2HNw",
+        "image": "VP_thumbnail.png"
+      },
+      {
+        "slug": "migration-data-poetry",
+        "title": "MIGRATION DATA POETRY PROJECT",
+        "subtitle": "A whole-school project combining migration data and poetry to explore the complex reality of international migration",
+        "details": "Teacher & Curriculum Designer | Greenfield Center School | 2019",
+        "overview": [
+          "The Migration Data Poetry Project is an interdisciplinary, whole-school project I designed as a classroom teacher at the Greenfield Center School. The project attempts to answer questions about who today's migrants are, where they come from, migrate to, and why, without reducing their stories to economic trends and simplistic tropes. Using data from the U.N. International Migration Report, I generated poem prompts that invited students from across the school to imagine the unique stories of individual migrants. The result was more than 100 poems exploring the diverse, multi-faceted reality of international migration."
+        ],
+        "disclosures": "",
+        "vimeoId": "497056564",
+        "image": "migration_data_thumbnail.png",
+        "video": ""
+      }
+    ],
+    "pieces_hidden": [
+      {
+        "slug": "creative-decimal-division",
+        "title": "CREATIVE DECIMAL DIVISION",
+        "subtitle": "A playful, visual decimal division game designed for ST Math",
+        "details": "Lead Designer | MIND Education | 2023",
+        "overview": [
+          "I designed this fine-art-themed decimal division learning game for ST Math, a game-based, K-8, supplemental math product. This game targets 5th and 6th grade Common Core standards using an original, visual model of the partial product division strategy. Players explore decimal division in flexible, hands-on game modes, before solidifying their understanding in number and algorithm-based modes."
+        ],
+        "disclosures": "Creative Decimal Division art by Pamela Tseng. Creative Decimal Division was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Creative Decimal Division belong to MIND Education.",
+        "youtubeId": "kJDH0vdj82o",
+        "image": "CDD_thumbnail.png"
       }
     ]
   },

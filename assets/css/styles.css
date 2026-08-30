@@ -320,7 +320,7 @@ a { color: inherit; }
   height: 275px;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, calc(-50% - 10px));
   width: 28%;
   display: flex;
   justify-content: center;
