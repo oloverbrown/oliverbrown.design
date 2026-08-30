@@ -43,7 +43,7 @@ the door's window and the whole lower pink region.
 ## Files
 
 ```
-index.html              Landing page shell (4 empty sections, filled by main.js)
+index.html              Landing page shell (sections filled by main.js)
 config.json             All content + theme
 assets/css/styles.css   Single stylesheet
 assets/js/main.js       Landing renderer + door link
@@ -127,28 +127,99 @@ Rendered top to bottom by `renderAbout`: heading → pillars → text row → sk
   (currently `-80px`). Each intro line is one array item in config with
   `white-space: nowrap`.
 
+## Scroll architecture (important — don't break)
+
+`<main>` is the scroll container on **both** the main page and subpages. Its CSS:
+
+```css
+main {
+  position: relative;
+  margin-top: var(--nav-h);
+  height: calc(100vh - var(--nav-h));
+  overflow-y: scroll;
+  overscroll-behavior: none;
+  scroll-behavior: smooth;
+  background: var(--inside-bg);
+}
+```
+
+- `margin-top` positions main exactly at the navbar bottom; `overflow-y: scroll`
+  clips content that scrolls above that line. This is the only correct way to
+  prevent content from showing behind the navbar — JS clip-path can't keep up
+  with the compositor and always lags on macOS elastic scroll. Don't revert to
+  clip-path.
+- `overscroll-behavior: none` is on `main` (the actual scroll container), not just
+  `html`/`body`. Must stay on the scroll container element.
+- `background: var(--inside-bg)` fills the pink "inside" color behind the
+  sections, including the bottom overscroll bounce zone.
+- On subpages, `<main class="piece-page">` is both the scroll container and the
+  content root. `.piece-page` has higher CSS specificity than `main` (class vs
+  element selector), so any property `.piece-page` sets overrides `main`. Currently
+  `.piece-page` sets `background: transparent` (kids show through), `z-index: 3`
+  (content above kids), and `margin-top: var(--nav-h)` (below navbar). The
+  `height`, `overflow-y`, and `overscroll-behavior` come from the `main` rule.
+- `<main>` does NOT have an explicit `z-index` on the main landing page — this is
+  intentional: no stacking context means children's z-indexes (headline z:1,
+  about__box z:3) participate in the root stacking context. The kids canvas (z:2,
+  fixed, outside main) correctly slots between them.
+
+## Z-index layering
+
+```
+z: 100  nav text (.nav, position fixed)
+z:   3  section content: .about__box, .portfolio, .contact, .piece-page (subpages)
+z:   2  kids canvas (.kids-canvas--lower, position fixed, outside main)
+z:   1  nav background (.nav__bg, position fixed) + .about__headline
+```
+
+Kids walk in front of the navbar bar and the headline, but behind all readable
+content. On subpages, `.piece-page { z-index: 3 }` creates a stacking context —
+all piece content renders at z:3 globally, so kids appear behind it.
+
 ## The kids simulation ([`kids.js`](assets/js/kids.js))
 
 Canvas-based crowd sim. Two regions, each its own `<canvas>` layer:
-- **Door region** — kids on the small pink rectangle behind the door window;
-  `noIdle: true` (continuous movement), `clickable: false`.
-- **Lower region** — kids across the about→contact pink area; responds to clicks.
+- **Door region** — 25 kids on the small pink rectangle behind the door window;
+  `noIdle: true` (continuous movement), `clickable: false`. Main page only.
+- **Lower region** — kids across the full viewport; responds to clicks. Runs on
+  **both** the main page and all portfolio subpages.
+
+Key properties of the lower region:
+- `spriteW: 62` (10% smaller than the original 69)
+- Canvas extends 1 sprite-width (`62px`) beyond every viewport edge so kids can
+  spawn and walk in from off-screen. `measure()` returns
+  `{ left: -62, top: -62, width: clientWidth+124, height: clientHeight+124 }`;
+  `Region.resize()` sets inline styles that override the CSS defaults.
+- `cycleColors: true` — colors cycle sequentially through `KID_COLORS` instead
+  of randomly, so the full palette is always evenly represented.
+- Kids spawn at the canvas perimeter (`atEdge: true`) so they walk in from all
+  edges and are never visible at rest.
+- Count scales to crowd density based on about/contact section height (+20 extra).
+
+**State persistence across navigation:**
+Kids save their full state to `sessionStorage` (`'kids-lower'` key) on
+`pagehide`, and restore it on the next page load. Saved fields per kid:
+`x, y, dir, ci, state, speed, targetSpeed, stateDur, stateElapsed`. This means
+kids continue moving exactly as they were after navigating to/from a subpage.
+On subpages, kids.js listens for `DOMContentLoaded` instead of `ob:ready`
+(piece.js never dispatches `ob:ready`). The sprite path on subpages is
+`../sprites/child.png` (one level up from `portfolio/`).
+
+Each `portfolio/*.html` must include both:
+```html
+<script src="../assets/js/piece.js"></script>
+<script src="../assets/js/kids.js"></script>
+```
 
 Tunable constants live at the top of the file (`MOUSE_RADIUS`, `ATTRACT`,
-`CLICK_*`, `IDLE_*`, `MOVE_*`, `SPEED_*`) and the spawn counts / `spriteW` are in
-the `start()` bootstrap. Behavior per kid: random color from the 7 pastel hexes,
-random heading, idle/move states with a triangular speed ramp, boundary radius =
-½ sprite width (feet-based) for wall + kid collisions, turn-opposite-±90° on
-obstacle, mouse-move attraction, click = strong sustained seek then scatter,
-y-sorted draw order each frame.
+`CLICK_*`, `IDLE_*`, `MOVE_*`, `SPEED_*`, `LOWER_SPRITE_W`) and the spawn
+counts are in `start()`.
 
 Gotchas:
 - **Collision escape valve:** `Kid.step()` only blocks a move that pushes *further into* an
   overlapping neighbour — moves that increase separation are allowed. This prevents kids from
   freezing in a vertical pile after a window resize clamps multiple kids to the same edge.
   Don't revert this to a simple "any overlap = blocked" check.
-- Sprite `SPRITE_SRC` is resolved **relative to index.html** (`sprites/child.png`),
-  not to the JS file.
 - The kid palette is **hardcoded** as `KID_COLORS` in kids.js; `theme.childColors`
   in config.json is a manually-synced copy of it (the about skills tint from the
   config copy). If one changes, change the other.
@@ -156,9 +227,27 @@ Gotchas:
   so region geometry measures correctly. Don't remove that dispatch.
 - After `ob:ready`, `main.js` also re-scrolls to `window.location.hash` so that
   "back to portfolio" links land correctly after dynamic content shifts the layout.
-- Layering is deliberate: door pink `::before` (z1) < door kids canvas (z2) <
-  door image (z3); lower kids canvas (z1) < section content (z2). Canvases are
-  `pointer-events: none`; mouse input is read on `window`.
+
+## Sub-page layout
+
+Each `portfolio/*.html` has `<body class="subpage" data-slug="...">` and a single
+`<main class="piece-page" id="piece-root">` filled by `piece.js`. The `main` CSS
+makes it a full-width scroll container; `.piece-page` overrides to transparent
+background and `z-index: 3`. Content structure rendered by `renderPiece`:
+
+```
+.back-link                    ← pill button, outside the box
+.content-box.piece-page__content-box
+  .piece-page__title (h1)
+  .piece__details (p, optional)
+  .piece-page__hero
+  .piece-page__body
+.back-link.back-link--bottom  ← pill button, outside the box
+```
+
+`.piece-page__content-box` is `max-width: var(--maxw); margin: 1.5rem auto` —
+this centers the content while the scroll container (`<main>`) stays full-width
+so the scrollbar sits at the right edge of the window.
 
 ## Style conventions
 
@@ -167,8 +256,8 @@ Gotchas:
 - All body text is black (`#000`). Section headings are centered + lowercase
   (the lowercasing is in the config text, not `text-transform`).
 - The frosted white panel is `.content-box` (`rgba(255,255,255,0.15)` + blur),
-  shared by portfolio cards, the about text blocks, and the contact links. Reuse it
-  rather than making new translucent boxes.
+  shared by portfolio cards, the about text blocks, the contact links, and the
+  subpage content box. Reuse it rather than making new translucent boxes.
 - Accent color for "learn more" buttons, play icons, `heroLabel` text, and the
   "my resume" button: `#DCB8FB`.
 - **White-silhouette tinting:** `pillar_backing.png` / `skill_backing.png` are
@@ -180,10 +269,9 @@ Gotchas:
   images need the `../../` prefix.
 - Portfolio cards: info column (title + subtitle + "learn more") is centered via
   `.piece__info { display: flex; flex-direction: column; align-items: center; }`.
-- Sub-page layout: title and details are centered; hero spans full width; body text
-  (`max-width: 100%`) is left-aligned.
 - "back to portfolio" buttons use the same pill style as "learn more" (`#DCB8FB`
-  background, `999px` radius). One at the top, one at the bottom of each sub-page.
+  background, `999px` radius). One at the top, one at the bottom of each sub-page,
+  outside the `.content-box`.
 
 ## Workflow notes
 

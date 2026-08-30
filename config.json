@@ -40,8 +40,8 @@
       { "prefix": "for", "text": "Deep, Conceptual Learning", "color": "#FDB5CB" }
     ],
     "blocks": [
-      { "text": "11 years designing playful, hands-on learning as a classroom teacher taught me what rich learning experiences look like and today's EdTech has a long way to go. After years of waiting for truly innovative digital learning to arrive on my students' laptops, I decided to go build it myself.", "highlight": "classroom teacher" },
-      { "text": "I got a master's in EdTech from Harvard and a great job as a learning game designer. Since then I've led the design of 27 innovative games, designed a suite of 9 best-in-class accessibility features, reached more than 2 million K–12 students, and supported 174,000+ educators in 7,400+ schools.", "highlight": "learning game designer" }
+      { "text": "11 years designing playful, hands-on learning as a classroom teacher taught me what rich learning looks like and today's EdTech has a long way to go.", "highlight": "classroom teacher" },
+      { "text": "In 5 years designing and managing learning games at ST Math, I led development of 27 innovative games and 9 accessibility features across 3 products, reaching more than 2 million K-12 students.", "highlight": "designing and managing learning games" }
     ],
     "skills": [
       "Product Management",

@@ -120,7 +120,7 @@ function renderAbout(cfg) {
   const skills = cfg.about.skills || [];
   if (skills.length) {
     const colors = (cfg.theme && cfg.theme.childColors) || [];
-    wrap.appendChild(el('div', { class: 'about__label about__label--skills', text: 'Key Skills' }));
+    wrap.appendChild(el('div', { class: 'about__label about__label--skills', text: 'Skills / Services' }));
     wrap.appendChild(el('div', { class: 'about__skills' },
       skills.map((s, i) => el('div', { class: 'about__skill', style: `--skill-color: ${colors[i % colors.length]}` }, [
         el('span', { text: s }),
