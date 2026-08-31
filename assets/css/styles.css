@@ -471,7 +471,11 @@ a { color: inherit; }
 /* ---------- Portfolio ---------- */
 .portfolio {
   position: relative;
-  z-index: 3;
+}
+
+.portfolio .section__heading {
+  position: relative;
+  z-index: 1;
 }
 
 .portfolio__grid {
@@ -479,6 +483,8 @@ a { color: inherit; }
   gap: 2.5rem;
   max-width: var(--maxw);
   margin: 0 auto;
+  position: relative;
+  z-index: 3;
 }
 
 .piece {
@@ -609,10 +615,16 @@ a.piece__hero-label {
   max-width: 720px;
   margin: 0 auto;
   position: relative;
+}
+
+.contact__links.content-box {
+  position: relative;
   z-index: 3;
 }
 
 .contact h2 {
+  position: relative;
+  z-index: 1;
   font-size: 2rem;
   font-weight: 500;
   margin: 0 0 1rem;
