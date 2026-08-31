@@ -260,7 +260,8 @@ a { color: inherit; }
   letter-spacing: 0.01em;
   margin: 2rem auto 2.6rem;
   max-width: var(--maxw);
-  text-align: left;
+  text-align: justify;
+  text-align-last: justify;
   color: var(--inside-text);
 }
 
