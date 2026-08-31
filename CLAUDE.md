@@ -36,6 +36,9 @@ the door's window and the whole lower pink region.
   session.)
 - To add a portfolio piece: add an entry to `portfolio.pieces` in config.json
   **and** create a matching `portfolio/<slug>.html`.
+- Hidden pieces live in `portfolio.pieces_hidden` in config.json — move an entry
+  back into `portfolio.pieces` to restore it. Creative Decimal Division is currently
+  hidden there.
 - Nav entries in config support an optional `"target": "_blank"` (renderer adds
   `rel="noopener"`). Used by the "resume" link, which points at the PDF in the
   repo root. The first nav entry is the brand ("Oliver Brown", top-left).
@@ -49,9 +52,9 @@ assets/css/styles.css   Single stylesheet
 assets/js/main.js       Landing renderer + door link
 assets/js/kids.js       Canvas "kids" simulation (see below)
 assets/js/piece.js      Portfolio sub-page renderer
-portfolio/*.html        One per piece (treasure-box, creative-decimal-division,
-                          variable-pipes, greenfield-game, migration-data-poetry,
-                          dress-rehearsal, memory-metro)
+portfolio/*.html        One per piece (treasure-box, memory-metro, greenfield-game,
+                          dress-rehearsal, variable-pipes, migration-data-poetry,
+                          creative-decimal-division [hidden in pieces_hidden])
 sprites/                classroom_door.png, child.png (white silhouette, tinted at runtime)
 website_photo.png       Oliver's photo, shown in the about section
 pillar_backing.png      White silhouette behind each design pillar (CSS-mask tinted)
@@ -107,18 +110,25 @@ Rendered top to bottom by `renderAbout`: heading → pillars → text row → sk
   the heading. Text is 2rem / weight 300; the backing is `pillar_backing.png`
   tinted via CSS mask with the entry's color (`--pillar-color`), scaled 1.07.
 - Two text blocks stored as objects: `{ "text": "...", "highlight": "phrase" }`.
-  The `highlight` phrase is wrapped in `.about__highlight` (bold, nowrap) in `renderAbout`.
-- `.about__photo-col` is absolutely positioned over the middle of the text row and
-  spans its full height: the photo's top aligns with the top of the text blocks, and
-  the "my resume" button is pinned to the bottom (aligned with the text blocks'
-  bottoms, overlapping the photo). The button's width is computed from `--maxw`
-  (¾ of a skill-cell width) so it keeps its size wherever it lives.
+  The `highlight` phrase is wrapped in `.about__highlight` (bold) in `renderAbout`.
+- `.about__photo-col` is `position: absolute`, centered horizontally over the text
+  row via `left: 50%; transform: translate(-50%, calc(-50% - 10px))`. Fixed height
+  of **275px** — does not stretch to text height. `z-index: 2` so the resume button
+  (which hangs 50% below the col via `transform: translate(-50%, 50%)`) renders
+  above the sibling text blocks (z-index: 1).
 - The middle grid column (`.about__image`) is `visibility: hidden` — it just holds
   the photo's space open in the 3-column grid.
-- **Skills** (`about.skills`): flat string array shown below the text row in a
-  4-column grid (8 skills = 2 rows). Text is 1.3rem / weight 300 over
+- **Narrow layout (≤900px):** the bio row switches to `flex-direction: column` with
+  CSS `order`: block[0] first (order 1), photo-col second (order 2), block[1] third
+  (order 3). `about__image` is hidden. Photo-col becomes `position: relative` so it
+  flows in the column.
+- **Skills** (`about.skills`): flat string array labelled "Skills / Services" (set
+  in `main.js`, not config). Shown in a 4-column grid (8 skills = 2 rows) at wide
+  layouts; drops to 2 columns at ≤900px. Text is 1.3rem / weight 300 over
   `skill_backing.png`, mask-tinted by cycling `theme.childColors` in order
   (`--skill-color`); with 8 skills the last one wraps back to the first color.
+- About section labels (Design Pillars, Bio, Skills / Services) and the headline
+  are **left-aligned**. Pillar text within each pillar shape remains centered.
 
 ## The intro layout
 
@@ -255,7 +265,7 @@ so the scrollbar sits at the right edge of the window.
   **600 and 800 are not real**; `350` rounds to 300. Don't rely on them.
 - All body text is black (`#000`). Section headings are centered + lowercase
   (the lowercasing is in the config text, not `text-transform`).
-- The frosted white panel is `.content-box` (`rgba(255,255,255,0.15)` + blur),
+- The frosted white panel is `.content-box` (`rgba(255,255,255,0.25)` + blur),
   shared by portfolio cards, the about text blocks, the contact links, and the
   subpage content box. Reuse it rather than making new translucent boxes.
 - Accent color for "learn more" buttons, play icons, `heroLabel` text, and the
@@ -290,3 +300,6 @@ so the scrollbar sits at the right edge of the window.
   symmetric (verified pixel-exact in headless Chrome) — don't "fix" it with
   asymmetric padding. Headless Chrome + a screenshot is the reliable way to
   settle layout disputes.
+- **Narrow nav (≤760px):** `--nav-h` increases to `7.5rem`. The nav uses
+  `flex-wrap: wrap`; `.nav__brand` is `flex: 0 0 100%` so it occupies the full
+  first row and the links wrap to a second row beneath it.

@@ -77,14 +77,44 @@ function renderAbout(cfg) {
   const pillars = cfg.about.pillars || [];
   if (pillars.length) {
     wrap.appendChild(el('div', { class: 'about__label', text: 'Design Pillars' }));
-    wrap.appendChild(el('div', { class: 'about__pillars' },
-      pillars.map((p) => el('div', { class: 'about__pillar', style: `--pillar-color: ${p.color}` }, [
-        el('span', {}, [
-          p.prefix ? el('span', { class: 'about__pillar-prefix', text: `${p.prefix} ` }) : null,
-          p.text,
+
+    let open = false;
+    const pillarsEl = el('div', { class: 'about__pillars' });
+
+    const pillarEls = pillars.map((p) => {
+      const descEl = el('div', { class: 'about__pillar-desc' }, [
+        el('p', { text: p.description || '' }),
+      ]);
+      const pillarEl = el('div', {
+        class: 'about__pillar',
+        style: `--pillar-color: ${p.color}`,
+        tabindex: '0',
+        role: 'button',
+      }, [
+        el('div', { class: 'about__pillar__shape' }, [
+          el('span', {}, [
+            p.prefix ? el('span', { class: 'about__pillar-prefix', text: `${p.prefix} ` }) : null,
+            p.text,
+          ]),
         ]),
-      ]))
-    ));
+        el('div', { class: 'about__pillar__caret' }, ['›']),
+        descEl,
+      ]);
+      return pillarEl;
+    });
+
+    const toggle = () => {
+      open = !open;
+      pillarsEl.classList.toggle('about__pillars--open', open);
+    };
+
+    pillarEls.forEach(pe => {
+      pe.addEventListener('click', toggle);
+      pe.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+      pillarsEl.appendChild(pe);
+    });
+
+    wrap.appendChild(pillarsEl);
   }
 
   wrap.appendChild(el('div', { class: 'about__label about__label--bio', text: 'Bio' }));
@@ -93,10 +123,18 @@ function renderAbout(cfg) {
 
   const block = (item) => {
     const text = typeof item === 'string' ? item : item.text;
-    const phrase = typeof item === 'object' && item.highlight;
+    const phrases = typeof item === 'object' && item.highlight
+      ? (Array.isArray(item.highlight) ? item.highlight : [item.highlight])
+      : [];
     const p = document.createElement('p');
-    if (phrase && text.includes(phrase)) {
-      p.innerHTML = text.replace(phrase, `<span class="about__highlight">${phrase}</span>`);
+    if (phrases.length) {
+      let html = text;
+      for (const phrase of phrases) {
+        if (html.includes(phrase)) {
+          html = html.replace(phrase, `<span class="about__highlight">${phrase}</span>`);
+        }
+      }
+      p.innerHTML = html;
     } else {
       p.textContent = text;
     }

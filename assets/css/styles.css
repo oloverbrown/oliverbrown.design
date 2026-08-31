@@ -265,7 +265,7 @@ a { color: inherit; }
 }
 
 .about p {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 400;
   margin: 0;
   color: var(--outside-text);
@@ -279,20 +279,29 @@ a { color: inherit; }
 }
 
 .about__pillar {
-  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  cursor: pointer;
   text-align: center;
-  aspect-ratio: 708 / 253;
-  padding: 0 1.5rem;
   font-size: 2rem;
   font-weight: 300;
   line-height: 1.15;
   color: #000;
 }
 
-.about__pillar::before {
+.about__pillar__shape {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 708 / 253;
+  width: 100%;
+  padding: 0 1.5rem;
+  transition: filter 0.15s ease;
+}
+
+.about__pillar__shape::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -302,9 +311,54 @@ a { color: inherit; }
   transform: scale(1.07);
 }
 
-.about__pillar span { position: relative; white-space: pre-line; }
+.about__pillar:hover .about__pillar__shape {
+  filter: brightness(0.88);
+}
+
+.about__pillar__caret {
+  font-size: 2.8rem;
+  line-height: 0.5;
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+  margin-top: -0.2rem;
+  overflow: hidden;
+  height: 1.4rem;
+}
+
+.about__pillars--open .about__pillar__caret {
+  transform: rotate(270deg);
+}
+
+.about__pillar__shape span { position: relative; white-space: pre-line; }
 
 .about__pillar-prefix { font-size: 1rem; }
+
+.about__pillar-desc {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.about__pillars--open .about__pillar-desc {
+  grid-template-rows: 1fr;
+}
+
+.about__pillar-desc p {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.about__pillars--open .about__pillar-desc p {
+  padding-top: 0.6rem;
+}
 
 .about__row {
   position: relative;
