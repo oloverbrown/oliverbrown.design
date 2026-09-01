@@ -106,11 +106,18 @@ Hero priority: `youtubeId` → `vimeoId` → `itchioEmbed` → `video` → `imag
 
 Rendered top to bottom by `renderAbout`: heading → pillars → text row → skills.
 
-- **Pillars** (`about.pillars`): three `{ "text", "color" }` entries shown under
-  the heading. Text is 2rem / weight 300; the backing is `pillar_backing.png`
-  tinted via CSS mask with the entry's color (`--pillar-color`), scaled 1.07.
-- Two text blocks stored as objects: `{ "text": "...", "highlight": "phrase" }`.
-  The `highlight` phrase is wrapped in `.about__highlight` (bold) in `renderAbout`.
+- **Pillars** (`about.pillars`): three `{ "text", "color", "description" }` entries.
+  Text is 2rem / weight 300. Each pillar is a flex column: `.about__pillar__shape`
+  (holds the backing + text, `aspect-ratio: 708/253`) → `.about__pillar__caret`
+  (a `›` rotated 90°, 2.8rem, flips to 270° when open) → `.about__pillar-desc`
+  (description paragraph, hidden via `grid-template-rows: 0fr` when closed).
+  Clicking any pillar toggles all three descriptions open/closed simultaneously.
+  Hovering a pillar darkens its shape (`filter: brightness(0.88)` on `.about__pillar__shape`).
+  The backing is `pillar_backing.png` tinted via CSS mask on `.about__pillar__shape::before`.
+  Descriptions: no backing, left-aligned, 1.1rem.
+- **Bio blocks** (`about.blocks`): objects `{ "text": "...", "highlight": "phrase" }`.
+  `highlight` can be a **string** (one phrase) or an **array of strings** (multiple
+  phrases); each is wrapped in `.about__highlight` (bold). Font-size: 1.1rem.
 - `.about__photo-col` is `position: absolute`, centered horizontally over the text
   row via `left: 50%; transform: translate(-50%, calc(-50% - 10px))`. Fixed height
   of **275px** — does not stretch to text height. `z-index: 2` so the resume button
@@ -129,6 +136,8 @@ Rendered top to bottom by `renderAbout`: heading → pillars → text row → sk
   (`--skill-color`); with 8 skills the last one wraps back to the first color.
 - About section labels (Design Pillars, Bio, Skills / Services) and the headline
   are **left-aligned**. Pillar text within each pillar shape remains centered.
+- **About headline** (`about__headline`): `text-align: left`, `letter-spacing: 0.02em`
+  (hand-tuned so the text visually spans the width of the content box below it).
 
 ## The intro layout
 
@@ -177,14 +186,19 @@ main {
 
 ```
 z: 100  nav text (.nav, position fixed)
-z:   3  section content: .about__box, .portfolio, .contact, .piece-page (subpages)
+z:   3  section content: .about__box, .portfolio__grid, .contact__links.content-box,
+        .piece-page (subpages)
 z:   2  kids canvas (.kids-canvas--lower, position fixed, outside main)
-z:   1  nav background (.nav__bg, position fixed) + .about__headline
+z:   1  nav background (.nav__bg, position fixed) + .about__headline +
+        .portfolio .section__heading + .contact h2
 ```
 
-Kids walk in front of the navbar bar and the headline, but behind all readable
-content. On subpages, `.piece-page { z-index: 3 }` creates a stacking context —
-all piece content renders at z:3 globally, so kids appear behind it.
+Kids walk in front of the navbar bar, the about headline, and the portfolio/contact
+section headings, but behind all card/link content. `.portfolio` and `.contact`
+containers have NO z-index (no stacking context) — z:3 is set directly on
+`.portfolio__grid` and `.contact__links.content-box` so their children participate
+in the root stacking context. On subpages, `.piece-page { z-index: 3 }` creates a
+stacking context — all piece content renders at z:3 globally, so kids appear behind it.
 
 ## The kids simulation ([`kids.js`](assets/js/kids.js))
 

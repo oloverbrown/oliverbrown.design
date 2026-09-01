@@ -35,9 +35,9 @@
     "heading": "about",
     "headline": "crafting next-generation tools for playful learning",
     "pillars": [
-      { "text": "Playful, Active Experiences", "color": "#FFBEBE", "description": "I don't deliver information to passive receivers. I build research-backed, active experiences where learners have to get hands-on and turn their minds on." },
-      { "text": "Custom-Built\nAround Content", "color": "#C7E4F9", "description": "I don't build one-size-fits-all tools to teach any content. I build unique, content-specific tools that teach through content-specific interactions." },
-      { "prefix": "for", "text": "Deep, Conceptual Learning", "color": "#FDB5CB", "description": "I don't just cover the information on the test. I build experiences that target basic knowledge, big-picture concepts, deep skills, and learner dispositions." }
+      { "text": "Playful, Active Experiences", "color": "#FFBEBE", "description": "I build research-backed, active learning experiences where learners have to get hands-on and turn their minds on." },
+      { "text": "Custom-Built\nAround Content", "color": "#C7E4F9", "description": "I build content-specific interactions that bring concepts to life in ways one-size-fits-all, gamified tools cannot." },
+      { "prefix": "for", "text": "Deep, Conceptual Learning", "color": "#FDB5CB", "description": "I build tools that teach more than information, targeting concepts, higher-order skills, and learner dispositions." }
     ],
     "blocks": [
       { "text": "11 years designing playful, hands-on learning as a classroom teacher taught me what rich learning looks like and today's EdTech has a long way to go. My graduate study and ongoing teaching at Harvard have kept me plugged in to the latest research on digital learning and play.", "highlight": ["classroom teacher", "graduate study and ongoing teaching at Harvard"] },
