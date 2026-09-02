@@ -25,7 +25,7 @@
   const IDLE_MIN = 0.5, IDLE_MAX = 3;   // seconds per idle state (halved)
   const MOVE_MIN = 1,  MOVE_MAX = 6;    // seconds per movement state
   const SPEED_MIN = 1, SPEED_MAX = 7;   // px per frame at the peak of a move
-  const LOWER_SPRITE_W = 62;            // 69 × 0.9
+  const LOWER_SPRITE_W = 56;            // 69 × 0.81
 
   const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -393,7 +393,7 @@
         count = oldHeight > 0
           ? Math.max(1, Math.round(150 * viewHeight / oldHeight))
           : 150;
-        count += 20;
+        count += 15;
       }
       lower.spawn(count, true);
     }

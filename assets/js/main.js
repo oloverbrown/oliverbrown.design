@@ -75,8 +75,9 @@ function renderIntro(cfg) {
 function renderAbout(cfg) {
   const box = document.getElementById('about-content');
   if (!box) return;
-  if (cfg.about.headline) {
-    box.appendChild(el('h1', { class: 'about__headline', text: cfg.about.headline }));
+  const headlineWrap = document.getElementById('about-headline-wrap');
+  if (cfg.about.headline && headlineWrap) {
+    headlineWrap.appendChild(el('h1', { class: 'about__headline', text: cfg.about.headline }));
   }
 
   const wrap = el('div', { class: 'content-box about__box' });
