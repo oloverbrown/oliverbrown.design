@@ -49,10 +49,17 @@ function renderNav(cfg, brandHref = '#intro', linkPrefix = '') {
   // Black bar as its own layer (below the kids); nav text stays on top.
   document.body.appendChild(el('div', { class: 'nav__bg' }));
   const [brand, ...links] = cfg.nav;
+  const centerLinks = links.slice(0, 3);
+  const rightLinks = links.slice(3);
   nav.appendChild(el('a', { class: 'nav__brand', href: linkPrefix + brand.href, text: brand.label }));
   nav.appendChild(
+    el('nav', { class: 'nav__links nav__links--center' },
+      centerLinks.map((l) => el('a', { class: 'nav__link', href: linkPrefix + l.href, text: l.label, ...(l.target && { target: l.target, rel: 'noopener' }) }))
+    )
+  );
+  nav.appendChild(
     el('nav', { class: 'nav__links' },
-      links.map((l) => el('a', { class: 'nav__link', href: linkPrefix + l.href, text: l.label, ...(l.target && { target: l.target, rel: 'noopener' }) }))
+      rightLinks.map((l) => el('a', { class: 'nav__link', href: linkPrefix + l.href, text: l.label, ...(l.target && { target: l.target, rel: 'noopener' }) }))
     )
   );
 }
@@ -183,21 +190,37 @@ function thumb(piece) {
 }
 
 function renderPortfolio(cfg) {
-  const heading = document.getElementById('portfolio-heading');
-  const grid = document.getElementById('portfolio-grid');
-  if (!grid) return;
-  if (heading) heading.textContent = cfg.portfolio.heading;
+  const root = document.getElementById('portfolio-root');
+  if (!root) return;
 
+  const groups = [];
   cfg.portfolio.pieces.forEach((piece) => {
-    const card = el('a', { class: 'piece', href: `portfolio/${piece.slug}.html` }, [
-      el('div', { class: 'piece__info' }, [
-        el('h3', { class: 'piece__title', text: piece.title }),
-        el('p', { class: 'piece__blurb', text: piece.subtitle }),
-        el('span', { class: 'piece__more', text: 'learn more' })
-      ]),
-      thumb(piece)
-    ]);
-    grid.appendChild(card);
+    const cat = piece.category || null;
+    if (!groups.length || groups[groups.length - 1].category !== cat) {
+      groups.push({ category: cat, pieces: [] });
+    }
+    groups[groups.length - 1].pieces.push(piece);
+  });
+
+  groups.forEach((group, i) => {
+    const headingText = (i === 0 ? cfg.portfolio.heading : group.category) || '';
+    const id = headingText.replace(/\s+/g, '-');
+    const section = el('div', { class: 'portfolio__section', id });
+    section.appendChild(el('h2', { class: 'section__heading', text: headingText }));
+    const grid = el('div', { class: 'portfolio__grid' });
+    group.pieces.forEach((piece) => {
+      const card = el('a', { class: 'piece', href: `portfolio/${piece.slug}.html` }, [
+        el('div', { class: 'piece__info' }, [
+          el('h3', { class: 'piece__title', text: piece.title }),
+          el('p', { class: 'piece__blurb', text: piece.subtitle }),
+          el('span', { class: 'piece__more', text: 'learn more' })
+        ]),
+        thumb(piece)
+      ]);
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    root.appendChild(section);
   });
 }
 

@@ -42,11 +42,18 @@ function renderNav(cfg) {
   // Black bar as its own layer; nav text sits on top.
   document.body.appendChild(el('div', { class: 'nav__bg' }));
   const [brand, ...links] = cfg.nav;
+  const centerLinks = links.slice(0, 3);
+  const rightLinks = links.slice(3);
   // From a sub-page, links point back to the landing page sections.
   nav.appendChild(el('a', { class: 'nav__brand', href: `../index.html${brand.href}`, text: brand.label }));
   nav.appendChild(
+    el('nav', { class: 'nav__links nav__links--center' },
+      centerLinks.map((l) => el('a', { class: 'nav__link', href: `../index.html${l.href}`, text: l.label, ...(l.target && { target: l.target, rel: 'noopener' }) }))
+    )
+  );
+  nav.appendChild(
     el('nav', { class: 'nav__links' },
-      links.map((l) => el('a', { class: 'nav__link', href: `../index.html${l.href}`, text: l.label }))
+      rightLinks.map((l) => el('a', { class: 'nav__link', href: `../index.html${l.href}`, text: l.label, ...(l.target && { target: l.target, rel: 'noopener' }) }))
     )
   );
 }

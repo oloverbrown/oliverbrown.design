@@ -402,20 +402,20 @@
     // Save positions before leaving the page so they can be restored on the next.
     window.addEventListener('pagehide', () => saveKidState(lower));
 
-    // Mouse interaction.
+    // Mouse interaction. (click grouping disabled)
     window.addEventListener('mousemove', (e) => {
       regions.forEach((r) => r.attract(e.clientX, e.clientY));
     });
-    window.addEventListener('click', (e) => {
-      regions.forEach((r) => {
-        if (!r.clickable) return;
-        const rect = r.canvas.getBoundingClientRect();
-        if (e.clientX >= rect.left && e.clientX <= rect.right &&
-            e.clientY >= rect.top  && e.clientY <= rect.bottom) {
-          r.turnToward(e.clientX, e.clientY);
-        }
-      });
-    });
+    // window.addEventListener('click', (e) => {
+    //   regions.forEach((r) => {
+    //     if (!r.clickable) return;
+    //     const rect = r.canvas.getBoundingClientRect();
+    //     if (e.clientX >= rect.left && e.clientX <= rect.right &&
+    //         e.clientY >= rect.top  && e.clientY <= rect.bottom) {
+    //       r.turnToward(e.clientX, e.clientY);
+    //     }
+    //   });
+    // });
 
     const resizeAll = () => regions.forEach((r) => r.resize());
     window.addEventListener('resize', resizeAll);

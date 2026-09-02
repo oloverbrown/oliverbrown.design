@@ -8,7 +8,9 @@
   },
   "nav": [
     { "label": "Oliver Brown", "href": "#about" },
-    { "label": "portfolio", "href": "#portfolio" },
+    { "label": "learning games", "href": "#learning-games" },
+    { "label": "classroom projects", "href": "#classroom-projects" },
+    { "label": "game games", "href": "#game-games" },
     { "label": "contact", "href": "#contact" },
     { "label": "resume", "href": "Oliver Brown Resume.pdf", "target": "_blank" }
   ],
@@ -36,7 +38,7 @@
     "headline": "crafting next-generation tools for playful learning",
     "pillars": [
       { "text": "Playful, Active Experiences", "color": "#FFBEBE", "description": "I build research-backed, active learning experiences where learners have to get hands-on and turn their minds on." },
-      { "text": "Custom-Built\nAround Content", "color": "#C7E4F9", "description": "I build content-specific interactions that bring concepts to life in ways one-size-fits-all, gamified tools cannot." },
+      { "text": "Custom-Built\nAround Content", "color": "#C7E4F9", "description": "I build content-specific tools that make concepts interactive in ways one-size-fits-all content delivery can't." },
       { "prefix": "for", "text": "Deep, Conceptual Learning", "color": "#FDB5CB", "description": "I build tools that teach more than information, targeting concepts, higher-order skills, and learner dispositions." }
     ],
     "blocks": [
@@ -56,7 +58,7 @@
     "image": ""
   },
   "portfolio": {
-    "heading": "portfolio",
+    "heading": "learning games",
     "pieces": [
       {
         "slug": "treasure-box",
@@ -86,6 +88,19 @@
         "video": ""
       },
       {
+        "slug": "variable-pipes",
+        "title": "VARIABLE PIPES",
+        "subtitle": "A game that explores variable substitution, and true and false solution sets designed for ST Math",
+        "details": "Lead Designer | MIND Education | 2024",
+        "overview": [
+          "I designed this learning game about variables, expressions, equations, and inequalities for ST Math, a game-based, K-8, supplemental math product. The game targets 6th grade Common Core (CC) standards and allows learners to playfully interact with multi-variable expressions, equations, and inequalities. Through these interactions, learners build a conceptual understanding of variable substitution, true and false equations and inequalities, and solution sets."
+        ],
+        "disclosures": "Variable Pipes art by Joel Conklin. Variable Pipes was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Variable Pipes belong to MIND Education.",
+        "youtubeId": "2y4bNwc2HNw",
+        "image": "VP_thumbnail.png"
+      },
+      {
+        "category": "classroom projects",
         "slug": "greenfield-game",
         "title": "THE GREENFIELD GAME",
         "subtitle": "A classroom-based simulation where students run a small town and make decisions about economics, government, and infrastructure",
@@ -99,6 +114,21 @@
         "video": ""
       },
       {
+        "category": "classroom projects",
+        "slug": "migration-data-poetry",
+        "title": "MIGRATION DATA POETRY PROJECT",
+        "subtitle": "A whole-school project combining migration data and poetry to explore the complex reality of international migration",
+        "details": "Teacher & Curriculum Designer | Greenfield Center School | 2019",
+        "overview": [
+          "The Migration Data Poetry Project is an interdisciplinary, whole-school project I designed as a classroom teacher at the Greenfield Center School. The project attempts to answer questions about who today's migrants are, where they come from, migrate to, and why, without reducing their stories to economic trends and simplistic tropes. Using data from the U.N. International Migration Report, I generated poem prompts that invited students from across the school to imagine the unique stories of individual migrants. The result was more than 100 poems exploring the diverse, multi-faceted reality of international migration."
+        ],
+        "disclosures": "",
+        "vimeoId": "497056564",
+        "image": "migration_data_thumbnail.png",
+        "video": ""
+      },
+      {
+        "category": "game games",
         "slug": "dress-rehearsal",
         "title": "THE DRESS REHEARSAL DID NOT GO WELL",
         "subtitle": "A puzzle game built in 48 hours for a game jam with the theme 'Roles Reversed'",
@@ -110,31 +140,6 @@
         "itchioEmbed": "https://itch.io/embed-upload/8417833?color=370000",
         "itchioSize": [1920, 1080],
         "image": "dress_rehearsal_thumbnail.png",
-        "video": ""
-      },
-      {
-        "slug": "variable-pipes",
-        "title": "VARIABLE PIPES",
-        "subtitle": "A game that explores variable substitution, and true and false solution sets designed for ST Math",
-        "details": "Lead Designer | MIND Education | 2024",
-        "overview": [
-          "I designed this learning game about variables, expressions, equations, and inequalities for ST Math, a game-based, K-8, supplemental math product. The game targets 6th grade Common Core (CC) standards and allows learners to playfully interact with multi-variable expressions, equations, and inequalities. Through these interactions, learners build a conceptual understanding of variable substitution, true and false equations and inequalities, and solution sets."
-        ],
-        "disclosures": "Variable Pipes art by Joel Conklin. Variable Pipes was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Variable Pipes belong to MIND Education.",
-        "youtubeId": "2y4bNwc2HNw",
-        "image": "VP_thumbnail.png"
-      },
-      {
-        "slug": "migration-data-poetry",
-        "title": "MIGRATION DATA POETRY PROJECT",
-        "subtitle": "A whole-school project combining migration data and poetry to explore the complex reality of international migration",
-        "details": "Teacher & Curriculum Designer | Greenfield Center School | 2019",
-        "overview": [
-          "The Migration Data Poetry Project is an interdisciplinary, whole-school project I designed as a classroom teacher at the Greenfield Center School. The project attempts to answer questions about who today's migrants are, where they come from, migrate to, and why, without reducing their stories to economic trends and simplistic tropes. Using data from the U.N. International Migration Report, I generated poem prompts that invited students from across the school to imagine the unique stories of individual migrants. The result was more than 100 poems exploring the diverse, multi-faceted reality of international migration."
-        ],
-        "disclosures": "",
-        "vimeoId": "497056564",
-        "image": "migration_data_thumbnail.png",
         "video": ""
       }
     ],

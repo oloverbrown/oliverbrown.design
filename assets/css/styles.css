@@ -96,6 +96,12 @@ a { color: inherit; }
   gap: 2.5rem;
 }
 
+.nav__links--center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .nav__link {
   font-size: 1.5rem;
   font-weight: 500;
@@ -478,6 +484,10 @@ a { color: inherit; }
   z-index: 1;
 }
 
+.portfolio__section + .portfolio__section {
+  margin-top: 4rem;
+}
+
 .portfolio__grid {
   display: grid;
   gap: 2.5rem;
@@ -486,6 +496,7 @@ a { color: inherit; }
   position: relative;
   z-index: 3;
 }
+
 
 .piece {
   display: grid;
