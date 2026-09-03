@@ -129,9 +129,23 @@
       },
       {
         "category": "game games",
+        "slug": "staircase-of-song",
+        "title": "STAIRCASE OF SONG",
+        "subtitle": "Record music to build a staircase out of the underworld",
+        "details": "Solo Designer & Developer | GMTK Game Jam | 2024",
+        "overview": [
+          "Get both heroes to the next yellow door! Based on the Greek myth of Orpheus and Eurydice and made solo in four days for the GMTK Game Jam 2024. The jam's theme was \"built to scale\", so I made a game where you build a staircase using a musical scale."
+        ],
+        "disclosures": "",
+        "itchioEmbed": "https://itch.io/embed-upload/11486871?color=333333",
+        "itchioSize": [1920, 1080],
+        "image": "staircase_of_song_thumbnail.png"
+      },
+      {
+        "category": "game games",
         "slug": "dress-rehearsal",
         "title": "THE DRESS REHEARSAL DID NOT GO WELL",
-        "subtitle": "A puzzle game built in 48 hours for a game jam with the theme 'Roles Reversed'",
+        "subtitle": "Solve spatial puzzles as the director of an ill-fated dress rehearsal",
         "details": "Designer & Developer | GMTK Game Jam | 2023",
         "overview": [
           "A puzzle game about mice and frogs putting on a play that refuses to go smoothly. Created in 48 hours for the 2023 GMTK Game Jam around the theme \"Roles Reversed,\" the game casts players as a stage-side puzzle solver: swap the masks worn by the actors to change how they move, and guide the show's two sweethearts to meet on the same square before the curtain call. I served as Lead Designer and Programmer, with art by Nathaniel Klein."
@@ -141,6 +155,20 @@
         "itchioSize": [1920, 1080],
         "image": "dress_rehearsal_thumbnail.png",
         "video": ""
+      },
+      {
+        "category": "game games",
+        "slug": "space-tinder",
+        "title": "SPACE TINDER",
+        "subtitle": "Swipe left or right on procedurally-generated interdimensional aliens",
+        "details": "Solo Designer & Developer | Scratch | 2020",
+        "overview": [
+          "placeholder"
+        ],
+        "disclosures": "",
+        "scratchEmbed": "https://scratch.mit.edu/projects/431725089/embed",
+        "scratchSize": [485, 402],
+        "image": "space_tinder_thumbnail.png"
       }
     ],
     "pieces_hidden": [
