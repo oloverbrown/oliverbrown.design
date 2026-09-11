@@ -63,7 +63,7 @@
       {
         "slug": "treasure-box",
         "title": "TREASURE BOX",
-        "subtitle": "A suite of innovative place value learning games I designed for ST Math",
+        "subtitle": "ST Math games that teach place value with hands-on digital manipulatives",
         "details": "Lead Designer | MIND Education | 2022 - 2024",
         "overview": [
           "Treasure Box is a suite of 6 learning games I designed for ST Math. Going beyond math tools that merely quiz students on place value, carrying, and borrowing as abstract concepts, Treasure Box lets students concretely compose, decompose, and regroup numbers with unique digital manipulatives designed from the ground up to teach these concepts. Spanning 3rd–6th grade Common Core and Texas standards, it remains the largest game development effort in ST Math's history, and is currently played by more than a million students every school year."
@@ -76,7 +76,7 @@
       {
         "slug": "memory-metro",
         "title": "MEMORY METRO",
-        "subtitle": "A memory + math game prototype developed solo with Claude Code",
+        "subtitle": "A math + working memory game prototype built solo with Claude Code",
         "details": "Solo Designer & Developer | MIND Education | 2026",
         "heroLabel": "click to play",
         "heroLink": "../mm_2lvls.html",
@@ -90,7 +90,7 @@
       {
         "slug": "variable-pipes",
         "title": "VARIABLE PIPES",
-        "subtitle": "A game that explores variable substitution, and true and false solution sets designed for ST Math",
+        "subtitle": "Making variable substitution and solution sets playable for ST Math",
         "details": "Lead Designer | MIND Education | 2024",
         "overview": [
           "I designed this learning game about variables, expressions, equations, and inequalities for ST Math, a game-based, K-8, supplemental math product. The game targets 6th grade Common Core (CC) standards and allows learners to playfully interact with multi-variable expressions, equations, and inequalities. Through these interactions, learners build a conceptual understanding of variable substitution, true and false equations and inequalities, and solution sets."
