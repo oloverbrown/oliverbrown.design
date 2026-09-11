@@ -213,6 +213,7 @@ function renderPortfolio(cfg) {
       const card = el('a', { class: 'piece', href: `portfolio/${piece.slug}.html` }, [
         el('div', { class: 'piece__info' }, [
           el('h3', { class: 'piece__title', text: piece.title }),
+          ...(piece.details ? [el('p', { class: 'piece__details', text: piece.details })] : []),
           el('p', { class: 'piece__blurb', text: piece.subtitle }),
           el('span', { class: 'piece__more', text: 'learn more' })
         ]),
