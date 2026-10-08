@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ls_build</title>
+    <title>3_levels</title>
     <style>
         @font-face {
             font-family: 'Nunito';
@@ -208,6 +208,13 @@
             min-width: 60px;
             font-size: 14px;
             color: #fff;
+        }
+
+        .inspector-field-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .stepper {
@@ -971,6 +978,19 @@
                 }
             },
             {
+                id: 'mm_light_pole_dead',
+                name: 'Light Pole Dead (Sprite)',
+                type: 'custom',
+                layer: 'tracks',
+                image: null, // Will be loaded
+                render: (ctx, x, y, size) => {
+                    const tileType = TILE_TYPES.find(t => t.id === 'mm_light_pole_dead');
+                    if (tileType && tileType.image && tileType.image.complete) {
+                        ctx.drawImage(tileType.image, x, y, size, size);
+                    }
+                }
+            },
+            {
                 id: 'mm_light',
                 name: 'Light (Sprite)',
                 type: 'custom',
@@ -995,6 +1015,40 @@
                             const drawY = y;
                             ctx.drawImage(tileType.image, drawX, drawY, imgWidth, imgHeight);
                         }
+                    }
+                }
+            },
+            {
+                id: 'mm_light_dead',
+                name: 'Light Dead (Sprite)',
+                type: 'custom',
+                layer: 'tracks',
+                image: null, // Will be loaded
+                render: (ctx, x, y, size) => {
+                    const tileType = TILE_TYPES.find(t => t.id === 'mm_light_dead');
+                    if (tileType && tileType.image && tileType.image.complete) {
+                        const imgWidth = tileType.image.width / SPRITE_SCALE;
+                        const imgHeight = tileType.image.height / SPRITE_SCALE;
+                        const drawX = x + (size - imgWidth) / 2;
+                        const drawY = y;
+                        ctx.drawImage(tileType.image, drawX, drawY, imgWidth, imgHeight);
+                    }
+                }
+            },
+            {
+                id: 'mm_light_flash',
+                name: 'Light Flash (Sprite)',
+                type: 'custom',
+                layer: 'tracks',
+                image: null, // Will be loaded
+                render: (ctx, x, y, size) => {
+                    const tileType = TILE_TYPES.find(t => t.id === 'mm_light_flash');
+                    if (tileType && tileType.image && tileType.image.complete) {
+                        const imgWidth = tileType.image.width / SPRITE_SCALE;
+                        const imgHeight = tileType.image.height / SPRITE_SCALE;
+                        const drawX = x + (size - imgWidth) / 2;
+                        const drawY = y;
+                        ctx.drawImage(tileType.image, drawX, drawY, imgWidth, imgHeight);
                     }
                 }
             },
@@ -1074,11 +1128,61 @@
 
                     // Get the sprite tile types
                     const poleType = TILE_TYPES.find(t => t.id === 'mm_light_pole');
+                    const deadPoleType = TILE_TYPES.find(t => t.id === 'mm_light_pole_dead');
                     const lightType = TILE_TYPES.find(t => t.id === 'mm_light');
+                    const deadLightType = TILE_TYPES.find(t => t.id === 'mm_light_dead');
+
+                    // Burn out animation flickers the pole and light together
+                    // between their normal and dead sprites, ending permanently
+                    // on the dead pair. See updateLightBurnout().
+                    const burnoutState = (gridX !== null && gridY !== null && window.lightBurnoutState)
+                        ? window.lightBurnoutState[`${gridX},${gridY}`]
+                        : null;
+                    const showDead = burnoutState ? !burnoutState.isOn : false;
+                    const activePoleType = (showDead && deadPoleType) ? deadPoleType : poleType;
+                    const activeLightType = (showDead && deadLightType) ? deadLightType : lightType;
 
                     // Draw the pole sprite first
-                    if (poleType && poleType.image && poleType.image.complete) {
-                        ctx.drawImage(poleType.image, x, y, size, size);
+                    if (activePoleType && activePoleType.image && activePoleType.image.complete) {
+                        ctx.drawImage(activePoleType.image, x, y, size, size);
+                    }
+
+                    // One-shot flash the moment the flicker starts, in the same
+                    // place as the pole/light sprites, behind the sparks.
+                    const flashType = TILE_TYPES.find(t => t.id === 'mm_light_flash');
+                    if (burnoutState && burnoutState.flashAlpha > 0 && flashType && flashType.image && flashType.image.complete) {
+                        const flashImgWidth = flashType.image.width / SPRITE_SCALE;
+                        const flashImgHeight = flashType.image.height / SPRITE_SCALE;
+                        // Centered on the same point the sparks spawn from.
+                        const flashOrigin = (gridX !== null && gridY !== null)
+                            ? computeLightSparkOrigin(gridX, gridY)
+                            : { x: x + size / 2, y: y + flashImgHeight / 2 };
+                        const flashCenterX = flashOrigin.x;
+                        const flashCenterY = flashOrigin.y;
+                        const flashDrawWidth = flashImgWidth * 2;
+                        const flashDrawHeight = flashImgHeight * 2;
+                        const flashDrawX = flashCenterX - flashDrawWidth / 2;
+                        const flashDrawY = flashCenterY - flashDrawHeight / 2;
+                        ctx.save();
+                        ctx.globalAlpha = burnoutState.flashAlpha;
+                        ctx.drawImage(flashType.image, flashDrawX, flashDrawY, flashDrawWidth, flashDrawHeight);
+                        ctx.restore();
+                    }
+
+                    // Burn out sparks sit just beneath the flickering light sprite,
+                    // on top of the pole. Positions are precomputed in world space
+                    // by updateLightBurnout()/computeLightSparkOrigin().
+                    if (burnoutState && burnoutState.sparks) {
+                        ctx.save();
+                        ctx.fillStyle = '#ffffff';
+                        burnoutState.sparks.forEach(spark => {
+                            if (spark.alpha <= 0) return;
+                            ctx.globalAlpha = spark.alpha;
+                            ctx.beginPath();
+                            ctx.arc(spark.x, spark.y, LIGHT_SPARK_RADIUS, 0, Math.PI * 2);
+                            ctx.fill();
+                        });
+                        ctx.restore();
                     }
 
                     // Get rotation angle and flip from direction property
@@ -1090,7 +1194,7 @@
                     const needsFlip = direction !== 'top' && direction !== 'bottom';
 
                     // Draw the light sprite on top with rotation and flipping
-                    if (lightType && lightType.image && lightType.image.complete) {
+                    if (activeLightType && activeLightType.image && activeLightType.image.complete) {
                         ctx.save();
 
                         // Set rotation and flip center at the tile center
@@ -1107,12 +1211,12 @@
                         ctx.translate(-centerX, -centerY);
 
                         // Always draw the full image (same in all modes)
-                        const imgWidth = lightType.image.width / SPRITE_SCALE;
-                        const imgHeight = lightType.image.height / SPRITE_SCALE;
+                        const imgWidth = activeLightType.image.width / SPRITE_SCALE;
+                        const imgHeight = activeLightType.image.height / SPRITE_SCALE;
                         // Center the image horizontally, align to top
                         const drawX = x + (size - imgWidth) / 2;
                         const drawY = y;
-                        ctx.drawImage(lightType.image, drawX, drawY, imgWidth, imgHeight);
+                        ctx.drawImage(activeLightType.image, drawX, drawY, imgWidth, imgHeight);
 
                         ctx.restore();
                     }
@@ -3523,6 +3627,12 @@
         let trainSpawnTemplates = []; // Array of spawn template objects
         let nextInstanceId = 1; // Unique ID counter for spawned instances
 
+        // Light burn out system: authored lights with a "burn out on" value flicker
+        // out and go permanently dead once solved_count hits that value (+ delay).
+        let lightBurnoutTemplates = []; // {gridX, gridY, burnOutOnValues, burnOutDelay}
+        let lightBurnoutQueue = []; // Templates waiting their turn, played one at a time
+        let lightBurnoutAnimations = []; // Active flicker animations: {gridX, gridY, frame, phase}
+
         // Run mode drag state
         let runDragTrain = null; // The train animation object being dragged
         let runDragLastWorld = null; // Previous mouse world position
@@ -3543,10 +3653,59 @@
         let keypadResetSprite = null;
         let keypadResetPressed = false;
         let keypadResetHovered = false;
+        let keypadLevelSelectSprite = null;
+        let keypadLevelSelectPressed = false;
+        let keypadLevelSelectHovered = false;
         let keypadTargetWorldX = null; // World X position of math fact to center on
         let keypadStartCameraX = null; // Starting horizontal camera position when keypad opens
         let keypadClosingFromCameraX = null; // Camera X when keypad starts closing
         let keypadClosingFromCameraY = null; // Camera Y when keypad starts closing
+
+        // Run-mode fade-to-black transition, used when restarting a level or
+        // leaving run mode (e.g. back to level select) so the swap isn't a hard cut.
+        const RUN_FADE_DURATION_MS = 350;
+        let runFadePhase = null; // 'out' | 'in' | null
+        let runFadeStart = 0;
+        let runFadeOnComplete = null;
+
+        function startRunFadeOut(onComplete) {
+            runFadePhase = 'out';
+            runFadeStart = performance.now();
+            runFadeOnComplete = onComplete;
+        }
+
+        function runFadeAlpha() {
+            if (!runFadePhase) return 0;
+            const t = Math.min(1, (performance.now() - runFadeStart) / RUN_FADE_DURATION_MS);
+            return runFadePhase === 'out' ? t : (1 - t);
+        }
+
+        function updateRunFade() {
+            if (!runFadePhase) return;
+            const t = (performance.now() - runFadeStart) / RUN_FADE_DURATION_MS;
+            if (t >= 1) {
+                if (runFadePhase === 'out') {
+                    const callback = runFadeOnComplete;
+                    runFadeOnComplete = null;
+                    runFadePhase = 'in';
+                    runFadeStart = performance.now();
+                    if (callback) callback();
+                } else {
+                    runFadePhase = null;
+                }
+            }
+        }
+
+        // Returns to the level-select screen. In the editor's standalone run
+        // tab (?mode=run) this just navigates back to it; a standalone export
+        // (which keeps both screens in one page) overrides this to swap
+        // screens in place instead.
+        function returnToLevelSelect() {
+            startRunFadeOut(() => {
+                const levelSelectUrl = window.location.href.split('?')[0] + '?mode=levelselect';
+                window.location.href = levelSelectUrl;
+            });
+        }
 
         // Feedback animation state
         let feedbackAnim = null; // null when not animating
@@ -3566,6 +3725,34 @@
         const SPAWN_ANIM_DURATION = SPAWN_ANIM_STAGGER * (SPAWN_ANIM_CIRCLES - 1) +
                                     SPAWN_ANIM_EXPAND_FRAMES + SPAWN_ANIM_FADE_FRAMES;
         let spawnAnimations = []; // {x, y, frame, template} — one per pending train
+        let pendingSpawnTemplates = []; // Templates waiting on fade in / burn out before their spawn animation starts
+
+        // Light burn out animation: a brief steady pause, then flickers between
+        // mm_light and mm_light_dead (starting fast and slowing down), then a
+        // brief pause on mm_light_dead before it's treated as fully finished.
+        const LIGHT_BURNOUT_PAUSE_FRAMES = 20; // frames at 60fps (~0.33s) held still, before and after the flicker
+        const LIGHT_BURNOUT_FLICKER_DURATION = 70; // frames at 60fps (~1.17s) of actual flickering
+        const LIGHT_BURNOUT_DURATION = LIGHT_BURNOUT_PAUSE_FRAMES * 2 + LIGHT_BURNOUT_FLICKER_DURATION;
+        const LIGHT_BURNOUT_FREQ_START = 18; // flickers/sec at the start (fast)
+        const LIGHT_BURNOUT_FREQ_END = 1;    // flickers/sec at the end (slow)
+        const LIGHT_BURNOUT_FREQ_EASE_POWER = 3; // >1 biases the frequency toward FREQ_END earlier in the flicker
+
+        // Sparks spawned once, on the first frame of the flicker. Origin is a
+        // fixed point on the mm_light sprite itself, in the same "logical"
+        // (pre-SPRITE_SCALE) pixel units as TILE_SIZE — see the light_pole
+        // render function, which positions mm_light the same way.
+        const LIGHT_SPARK_COUNT = 8;
+        const LIGHT_SPARK_LOCAL_X = 29.55;
+        const LIGHT_SPARK_LOCAL_Y = 29;
+        const LIGHT_SPARK_MIN_SPEED = 300; // px/sec
+        const LIGHT_SPARK_MAX_SPEED = 300; // px/sec
+        const LIGHT_SPARK_GRAVITY = 800;   // px/sec^2, pulls sparks slightly downward
+        const LIGHT_SPARK_RADIUS = 2.25;
+
+        // mm_light_flash: a one-shot flash drawn the moment the flicker starts,
+        // fading out over just a few frames.
+        const LIGHT_FLASH_FADE_FRAMES = 10; // frames the flash takes to fade out
+        const LIGHT_FLASH_PEAK_ALPHA = 0.4;
 
         // Snapshot of the level as loaded, used to reset run mode back to the start
         let initialRunLevelData = null;
@@ -3838,6 +4025,7 @@
             trainAnimations = [];
             trainSpawnTemplates = [];
             spawnAnimations = [];
+            pendingSpawnTemplates = [];
 
             objectTiles.forEach(tile => {
                 if (tile.tileType && tile.tileType.id === 'train') {
@@ -3875,23 +4063,32 @@
                 return;
             }
 
-            spawnAnimations.push({
-                x: offsetX + template.tile.gridX * TILE_SIZE + TILE_SIZE / 2,
-                y: offsetY + template.tile.gridY * TILE_SIZE + TILE_SIZE / 2,
-                frame: 0,
-                template: template
-            });
+            // Queued, not played yet — updateSpawnAnimations() holds it here
+            // until any tile reveal / light burn out finishes, so the spawn
+            // circles themselves don't start early.
+            pendingSpawnTemplates.push(template);
         }
 
         function updateSpawnAnimations() {
+            // Order is fade in, then burn out, then spawns — don't even start
+            // a queued spawn's circle animation until both are done. Burn outs
+            // now play one at a time, so wait for the whole queue, not just
+            // whichever one is currently playing.
+            if (pendingSpawnTemplates.length > 0 && !tileFadeAnim && lightBurnoutAnimations.length === 0 && lightBurnoutQueue.length === 0) {
+                pendingSpawnTemplates.forEach(template => {
+                    spawnAnimations.push({
+                        x: offsetX + template.tile.gridX * TILE_SIZE + TILE_SIZE / 2,
+                        y: offsetY + template.tile.gridY * TILE_SIZE + TILE_SIZE / 2,
+                        frame: 0,
+                        template: template
+                    });
+                });
+                pendingSpawnTemplates = [];
+            }
+
             if (spawnAnimations.length === 0) return;
 
             spawnAnimations.forEach(anim => { anim.frame += dt; });
-
-            // A finished animation still holds its train back until any tile
-            // reveal is done, so trains never arrive on track that is still
-            // fading in. Its circles have already faded out by this point.
-            if (tileFadeAnim) return;
 
             const finished = spawnAnimations.filter(anim => anim.frame >= SPAWN_ANIM_DURATION);
             if (finished.length === 0) return;
@@ -4065,6 +4262,160 @@
                     }
                 }
             });
+        }
+
+        // Light burn out system: authored lights become templates at level start,
+        // mirroring trainSpawnTemplates. A light with no "burn out on" value never
+        // burns out.
+        function initLightBurnoutAnimations() {
+            lightBurnoutTemplates = [];
+            lightBurnoutQueue = [];
+            lightBurnoutAnimations = [];
+            window.lightBurnoutState = {};
+
+            trackTiles.forEach(tile => {
+                if (!tile.tileType || tile.tileType.id !== 'light_pole') return;
+
+                const burnOutOnRaw = tile.burnOutOn != null ? String(tile.burnOutOn).trim() : '';
+                if (burnOutOnRaw === '') return;
+
+                const burnOutOnValues = burnOutOnRaw.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+                if (burnOutOnValues.length === 0) return;
+
+                lightBurnoutTemplates.push({
+                    gridX: tile.gridX,
+                    gridY: tile.gridY,
+                    burnOutOnValues: burnOutOnValues,
+                    burnOutDelay: tile.burnOutDelay || 0
+                });
+            });
+
+            checkBurnOutOnSolvedCount();
+        }
+
+        function checkBurnOutOnSolvedCount() {
+            lightBurnoutTemplates.forEach(template => {
+                if (isLightAlreadyBurningOutOrQueued(template)) return;
+
+                if (template.burnOutOnValues.includes(solved_count)) {
+                    if (template.burnOutDelay > 0) {
+                        setTimeout(() => startLightBurnout(template), template.burnOutDelay * 1000);
+                    } else {
+                        startLightBurnout(template);
+                    }
+                }
+            });
+        }
+
+        function isLightAlreadyBurningOutOrQueued(template) {
+            const key = `${template.gridX},${template.gridY}`;
+            if (window.lightBurnoutState[key]) return true; // burning out or already dead
+            return lightBurnoutQueue.some(t => t.gridX === template.gridX && t.gridY === template.gridY);
+        }
+
+        // Burn outs play one at a time, in the order they're triggered — a
+        // light waits its turn here looking perfectly normal, rather than
+        // several flickering out simultaneously.
+        function startLightBurnout(template) {
+            if (isLightAlreadyBurningOutOrQueued(template)) return;
+            lightBurnoutQueue.push(template);
+        }
+
+        // Pulls the next queued light off the front of the line and actually
+        // starts its flicker — called only when nothing else is currently
+        // playing. See updateLightBurnout().
+        function beginNextQueuedBurnout() {
+            if (lightBurnoutAnimations.length > 0 || lightBurnoutQueue.length === 0) return;
+
+            const template = lightBurnoutQueue.shift();
+            const key = `${template.gridX},${template.gridY}`;
+            window.lightBurnoutState[key] = { isOn: true, dead: false };
+            lightBurnoutAnimations.push({ gridX: template.gridX, gridY: template.gridY, frame: 0, phase: 0, sparks: null });
+        }
+
+        // Advances every active flicker animation by dt, then retires any that
+        // finished — their light stays dead and stops casting lit points/rails.
+        function updateLightBurnout() {
+            // Hold off flickering (and starting the next queued one) until any
+            // tile reveal finishes — order is fade in, then burn out, then
+            // spawns (see updateSpawnAnimations()).
+            if (tileFadeAnim) return;
+
+            if (lightBurnoutAnimations.length === 0) {
+                beginNextQueuedBurnout();
+            }
+            if (lightBurnoutAnimations.length === 0) return;
+
+            lightBurnoutAnimations.forEach(anim => {
+                anim.frame += dt;
+
+                const key = `${anim.gridX},${anim.gridY}`;
+                const state = window.lightBurnoutState[key];
+                if (!state) return;
+
+                const flickerFrame = anim.frame - LIGHT_BURNOUT_PAUSE_FRAMES;
+
+                if (flickerFrame < 0) {
+                    // Brief steady pause before the flicker starts.
+                    state.isOn = true;
+                } else if (flickerFrame < LIGHT_BURNOUT_FLICKER_DURATION) {
+                    const progress = flickerFrame / LIGHT_BURNOUT_FLICKER_DURATION;
+                    // Eased so frequency drops toward FREQ_END earlier, then
+                    // lingers there — same start/end rates, same total length.
+                    const easedProgress = 1 - Math.pow(1 - progress, LIGHT_BURNOUT_FREQ_EASE_POWER);
+                    const freq = LIGHT_BURNOUT_FREQ_START + (LIGHT_BURNOUT_FREQ_END - LIGHT_BURNOUT_FREQ_START) * easedProgress;
+                    anim.phase += freq * (dt / 60);
+                    state.isOn = (anim.phase % 1) < 0.5;
+
+                    // Spawn the sparks once, on the first frame of the flicker —
+                    // the flash below also starts fading from this same frame.
+                    if (!anim.sparks) {
+                        const origin = computeLightSparkOrigin(anim.gridX, anim.gridY);
+                        anim.sparks = [];
+                        for (let i = 0; i < LIGHT_SPARK_COUNT; i++) {
+                            const sparkAngle = Math.random() * Math.PI * 2;
+                            const speed = LIGHT_SPARK_MIN_SPEED + Math.random() * (LIGHT_SPARK_MAX_SPEED - LIGHT_SPARK_MIN_SPEED);
+                            anim.sparks.push({
+                                originX: origin.x,
+                                originY: origin.y,
+                                vx: Math.cos(sparkAngle) * speed,
+                                vy: Math.sin(sparkAngle) * speed
+                            });
+                        }
+                        anim.flashStartFrame = anim.frame;
+                    }
+
+                    // Sparks fade out over the flicker, reaching alpha 0 right
+                    // at the end, and arc slightly downward as they fly out.
+                    const tSec = flickerFrame / 60;
+                    const alpha = 1 - progress;
+                    state.sparks = anim.sparks.map(spark => ({
+                        x: spark.originX + spark.vx * tSec,
+                        y: spark.originY + spark.vy * tSec + 0.5 * LIGHT_SPARK_GRAVITY * tSec * tSec,
+                        alpha: alpha
+                    }));
+
+                    // mm_light_flash fades out much faster than the sparks.
+                    const flashElapsed = anim.frame - anim.flashStartFrame;
+                    state.flashAlpha = LIGHT_FLASH_PEAK_ALPHA * Math.max(0, 1 - flashElapsed / LIGHT_FLASH_FADE_FRAMES);
+                } else {
+                    // Brief steady pause on mm_light_dead before the animation
+                    // is considered finished (see the filter below).
+                    state.isOn = false;
+                    state.sparks = null;
+                    state.flashAlpha = 0;
+                    state.dead = true;
+                }
+            });
+
+            const stillActive = lightBurnoutAnimations.filter(anim => anim.frame < LIGHT_BURNOUT_DURATION);
+            if (stillActive.length !== lightBurnoutAnimations.length) {
+                lightBurnoutAnimations = stillActive;
+                // A light just died for good — it stops lighting rails/trains, so
+                // refresh the cached lit points now rather than waiting on the
+                // usual fade-in/reset triggers.
+                persistentLitPoints = addInterpolatedLitPoints(computeLitPoints());
+            }
         }
 
         function extendPathBackward(train) {
@@ -4764,7 +5115,8 @@
         const KEYPAD_BUTTON_RADIUS = 3;
         const KEYPAD_INPUT_RADIUS = 6;
         const KEYPAD_RESET_BUTTON_SIZE = 60;
-        const KEYPAD_RESET_GAP = 45; // Extra breathing room above the reset key, larger than KEYPAD_PADDING to set it apart from the rest of the keys
+        const KEYPAD_RESET_GAP = 22.5; // Extra breathing room above the reset key, larger than KEYPAD_PADDING to set it apart from the rest of the keys
+        const KEYPAD_LEVEL_SELECT_GAP = 14; // Gap between the restart key and the return-to-level-select key below it
         // Button layout: 2 columns × 6 rows
         // Col 0: 1,2,3,4,5,delete  Col 1: 6,7,8,9,0,submit
         const KEYPAD_BUTTONS = [
@@ -4780,7 +5132,7 @@
             const gridW = KEYPAD_COLS * KEYPAD_BUTTON_SIZE + (KEYPAD_COLS - 1) * KEYPAD_PADDING;
             const gridH = KEYPAD_ROWS * KEYPAD_BUTTON_SIZE + (KEYPAD_ROWS - 1) * KEYPAD_PADDING;
             const contentW = Math.max(KEYPAD_INPUT_WIDTH, gridW, KEYPAD_RESET_BUTTON_SIZE);
-            const contentH = KEYPAD_INPUT_HEIGHT + KEYPAD_PADDING + gridH + KEYPAD_RESET_GAP + KEYPAD_RESET_BUTTON_SIZE;
+            const contentH = KEYPAD_INPUT_HEIGHT + KEYPAD_PADDING + gridH + KEYPAD_RESET_GAP + KEYPAD_RESET_BUTTON_SIZE + KEYPAD_LEVEL_SELECT_GAP + KEYPAD_RESET_BUTTON_SIZE;
             const panelW = contentW + KEYPAD_PADDING * 2;
             const panelH = CAMERA_HEIGHT - KEYPAD_PADDING * 2;
             return { panelW, panelH, contentW, contentH, gridW, gridH };
@@ -4823,6 +5175,51 @@
             const rx = panelX + KEYPAD_PADDING + (contentW - KEYPAD_RESET_BUTTON_SIZE) / 2;
             const ry = gridOffsetY + gridH + KEYPAD_RESET_GAP;
             return { x: rx, y: ry, w: KEYPAD_RESET_BUTTON_SIZE, h: KEYPAD_RESET_BUTTON_SIZE };
+        }
+
+        function getKeypadLevelSelectButtonRect() {
+            const resetRect = getKeypadResetButtonRect();
+            return {
+                x: resetRect.x,
+                y: resetRect.y + resetRect.h + KEYPAD_LEVEL_SELECT_GAP,
+                w: KEYPAD_RESET_BUTTON_SIZE,
+                h: KEYPAD_RESET_BUTTON_SIZE
+            };
+        }
+
+        // Shared look for the reset and return-to-level-select keypad keys:
+        // a rounded square, darkened while pressed, highlighted on hover,
+        // with a sprite drawn on top.
+        function drawKeypadRoundButton(ctx, rect, pressed, hovered, sprite) {
+            let fillColor = '#212121';
+            if (pressed) {
+                const r = parseInt(fillColor.slice(1, 3), 16);
+                const g = parseInt(fillColor.slice(3, 5), 16);
+                const b = parseInt(fillColor.slice(5, 7), 16);
+                fillColor = `#${Math.round(r * 0.5).toString(16).padStart(2, '0')}${Math.round(g * 0.5).toString(16).padStart(2, '0')}${Math.round(b * 0.5).toString(16).padStart(2, '0')}`;
+            }
+
+            ctx.fillStyle = fillColor;
+            ctx.beginPath();
+            ctx.moveTo(rect.x + KEYPAD_BUTTON_RADIUS, rect.y);
+            ctx.lineTo(rect.x + rect.w - KEYPAD_BUTTON_RADIUS, rect.y);
+            ctx.arcTo(rect.x + rect.w, rect.y, rect.x + rect.w, rect.y + KEYPAD_BUTTON_RADIUS, KEYPAD_BUTTON_RADIUS);
+            ctx.lineTo(rect.x + rect.w, rect.y + rect.h - KEYPAD_BUTTON_RADIUS);
+            ctx.arcTo(rect.x + rect.w, rect.y + rect.h, rect.x + rect.w - KEYPAD_BUTTON_RADIUS, rect.y + rect.h, KEYPAD_BUTTON_RADIUS);
+            ctx.lineTo(rect.x + KEYPAD_BUTTON_RADIUS, rect.y + rect.h);
+            ctx.arcTo(rect.x, rect.y + rect.h, rect.x, rect.y + rect.h - KEYPAD_BUTTON_RADIUS, KEYPAD_BUTTON_RADIUS);
+            ctx.lineTo(rect.x, rect.y + KEYPAD_BUTTON_RADIUS);
+            ctx.arcTo(rect.x, rect.y, rect.x + KEYPAD_BUTTON_RADIUS, rect.y, KEYPAD_BUTTON_RADIUS);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.strokeStyle = hovered ? '#4ECEC5' : '#000000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            if (sprite && sprite.complete) {
+                ctx.drawImage(sprite, rect.x, rect.y, rect.w, rect.h);
+            }
         }
 
         function drawKeypad(ctx) {
@@ -4957,35 +5354,11 @@
 
             // Draw reset button below the button grid, styled like the delete key
             const resetRect = getKeypadResetButtonRect();
-            let resetFillColor = '#212121';
-            if (keypadResetPressed) {
-                const r = parseInt(resetFillColor.slice(1, 3), 16);
-                const g = parseInt(resetFillColor.slice(3, 5), 16);
-                const b = parseInt(resetFillColor.slice(5, 7), 16);
-                resetFillColor = `#${Math.round(r * 0.5).toString(16).padStart(2, '0')}${Math.round(g * 0.5).toString(16).padStart(2, '0')}${Math.round(b * 0.5).toString(16).padStart(2, '0')}`;
-            }
+            drawKeypadRoundButton(ctx, resetRect, keypadResetPressed, keypadResetHovered, keypadResetSprite);
 
-            ctx.fillStyle = resetFillColor;
-            ctx.beginPath();
-            ctx.moveTo(resetRect.x + KEYPAD_BUTTON_RADIUS, resetRect.y);
-            ctx.lineTo(resetRect.x + resetRect.w - KEYPAD_BUTTON_RADIUS, resetRect.y);
-            ctx.arcTo(resetRect.x + resetRect.w, resetRect.y, resetRect.x + resetRect.w, resetRect.y + KEYPAD_BUTTON_RADIUS, KEYPAD_BUTTON_RADIUS);
-            ctx.lineTo(resetRect.x + resetRect.w, resetRect.y + resetRect.h - KEYPAD_BUTTON_RADIUS);
-            ctx.arcTo(resetRect.x + resetRect.w, resetRect.y + resetRect.h, resetRect.x + resetRect.w - KEYPAD_BUTTON_RADIUS, resetRect.y + resetRect.h, KEYPAD_BUTTON_RADIUS);
-            ctx.lineTo(resetRect.x + KEYPAD_BUTTON_RADIUS, resetRect.y + resetRect.h);
-            ctx.arcTo(resetRect.x, resetRect.y + resetRect.h, resetRect.x, resetRect.y + resetRect.h - KEYPAD_BUTTON_RADIUS, KEYPAD_BUTTON_RADIUS);
-            ctx.lineTo(resetRect.x, resetRect.y + KEYPAD_BUTTON_RADIUS);
-            ctx.arcTo(resetRect.x, resetRect.y, resetRect.x + KEYPAD_BUTTON_RADIUS, resetRect.y, KEYPAD_BUTTON_RADIUS);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.strokeStyle = keypadResetHovered ? '#4ECEC5' : '#000000';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            if (keypadResetSprite && keypadResetSprite.complete) {
-                ctx.drawImage(keypadResetSprite, resetRect.x, resetRect.y, resetRect.w, resetRect.h);
-            }
+            // Draw the return-to-level-select button beneath the reset button, same style
+            const levelSelectRect = getKeypadLevelSelectButtonRect();
+            drawKeypadRoundButton(ctx, levelSelectRect, keypadLevelSelectPressed, keypadLevelSelectHovered, keypadLevelSelectSprite);
         }
 
         function calculateKeypadTargetCamera() {
@@ -5072,6 +5445,13 @@
         function hitTestKeypadReset(canvasX, canvasY) {
             if (keypadSlideProgress < 1) return false;
             const rect = getKeypadResetButtonRect();
+            return canvasX >= rect.x && canvasX <= rect.x + rect.w &&
+                   canvasY >= rect.y && canvasY <= rect.y + rect.h;
+        }
+
+        function hitTestKeypadLevelSelect(canvasX, canvasY) {
+            if (keypadSlideProgress < 1) return false;
+            const rect = getKeypadLevelSelectButtonRect();
             return canvasX >= rect.x && canvasX <= rect.x + rect.w &&
                    canvasY >= rect.y && canvasY <= rect.y + rect.h;
         }
@@ -5196,6 +5576,7 @@
                 // updateSpawnAnimations().
                 startTileFadeIn();
                 checkSpawnOnSolvedCount();
+                checkBurnOutOnSolvedCount();
                 const train = trainAnimations.find(t => t.trainId === feedbackAnim.trainId);
                 if (train) {
                     const mid = feedbackAnim.middleCarIndex;
@@ -5928,6 +6309,7 @@
         function handleRunMouseDown(e) {
             if (runModeState === 'animation') return;
             if (isTileFadeBlockingInput()) return;
+            if (runFadePhase) return;
 
             const screenCoords = getRunModeCanvasCoords(e);
 
@@ -5941,7 +6323,12 @@
                 }
                 if (hitTestKeypadReset(screenCoords.x, screenCoords.y)) {
                     keypadResetPressed = true;
-                    resetLevel();
+                    startRunFadeOut(resetLevel);
+                    return;
+                }
+                if (hitTestKeypadLevelSelect(screenCoords.x, screenCoords.y)) {
+                    keypadLevelSelectPressed = true;
+                    returnToLevelSelect();
                     return;
                 }
                 // If clicking inside the keypad panel but not on a button, consume the click
@@ -6039,13 +6426,15 @@
                 const btnIdx = hitTestKeypad(screenCoords.x, screenCoords.y);
                 keypadHoveredButton = btnIdx >= 0 ? btnIdx : null;
                 keypadResetHovered = hitTestKeypadReset(screenCoords.x, screenCoords.y);
-                if (btnIdx >= 0 || keypadResetHovered || isPointInKeypadPanel(screenCoords.x, screenCoords.y)) {
-                    canvas.style.cursor = (btnIdx >= 0 || keypadResetHovered) ? 'pointer' : 'default';
+                keypadLevelSelectHovered = hitTestKeypadLevelSelect(screenCoords.x, screenCoords.y);
+                if (btnIdx >= 0 || keypadResetHovered || keypadLevelSelectHovered || isPointInKeypadPanel(screenCoords.x, screenCoords.y)) {
+                    canvas.style.cursor = (btnIdx >= 0 || keypadResetHovered || keypadLevelSelectHovered) ? 'pointer' : 'default';
                     return;
                 }
             } else {
                 keypadHoveredButton = null;
                 keypadResetHovered = false;
+                keypadLevelSelectHovered = false;
             }
 
             if (!runDragTrain) {
@@ -6125,9 +6514,14 @@
         }
 
         function handleRunMouseUp(e) {
-            if (runModeState === 'animation') return;
+            // Always clear pressed state, even if this mouseup lands after the
+            // submit button's mousedown already kicked off the feedback
+            // animation — otherwise the button is stuck looking pressed.
             keypadPressedButton = null;
             keypadResetPressed = false;
+            keypadLevelSelectPressed = false;
+
+            if (runModeState === 'animation') return;
             if (runDragTrain) {
                 runDragTrain = null;
                 runDragLastWorld = null;
@@ -6188,6 +6582,8 @@
             // Tile reveals and spawn animations play over whatever else is happening
             updateTileFadeIn();
             updateSpawnAnimations();
+            updateLightBurnout();
+            updateRunFade();
 
             draw();
             animationFrameId = requestAnimationFrame(gameLoop);
@@ -6293,7 +6689,7 @@
             let litPoints;
             if (!isRunMode) {
                 litPoints = computeLitPoints();
-            } else if (tileFadeAnim) {
+            } else if (tileFadeAnim || lightBurnoutAnimations.length > 0 || lightBurnoutQueue.length > 0) {
                 litPoints = addInterpolatedLitPoints(computeLitPoints());
             } else {
                 litPoints = persistentLitPoints;
@@ -6449,6 +6845,16 @@
 
                 // Draw feedback animation in screen space
                 drawFeedbackAnimation(ctx);
+
+                // Fade-to-black overlay (restarting a level / leaving run mode)
+                const fadeAlpha = runFadeAlpha();
+                if (fadeAlpha > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = fadeAlpha;
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+                    ctx.restore();
+                }
             }
         }
 
@@ -6484,7 +6890,7 @@
                 // Skip drag_lines_car - it's only used as an overlay, not a placeable tile
                 if (tileType.id === 'drag_lines_car') return;
                 // Skip sprite-only tiles - they're only used as sprites, not placeable tiles
-                if (tileType.id === 'mm_light_pole' || tileType.id === 'mm_light' ||
+                if (tileType.id === 'mm_light_pole' || tileType.id === 'mm_light_pole_dead' || tileType.id === 'mm_light' || tileType.id === 'mm_light_dead' || tileType.id === 'mm_light_flash' ||
                     tileType.id === 'lit_rails_straight' || tileType.id === 'lit_rails_curve' ||
                     tileType.id === 'mm_stop_background' || tileType.id === 'mm_stop_light1' || tileType.id === 'mm_stop_light2') return;
 
@@ -7461,6 +7867,41 @@
             return angles[direction] || 0;
         }
 
+        // World-space position of the fixed spark-origin point on the mm_light
+        // sprite, after the same rotate/flip transform the light_pole render
+        // function applies to the sprite itself (see its ctx.save() block).
+        function computeLightSparkOrigin(gridX, gridY) {
+            const x = offsetX + gridX * TILE_SIZE;
+            const y = offsetY + gridY * TILE_SIZE;
+            const size = TILE_SIZE;
+            const centerX = x + size / 2;
+            const centerY = y + size / 2;
+
+            const direction = getLightPoleDirectionByPosition(gridX, gridY);
+            const angle = lightPoleDirectionToAngle(direction);
+            const needsFlip = direction !== 'top' && direction !== 'bottom';
+
+            const lightType = TILE_TYPES.find(t => t.id === 'mm_light');
+            const imgWidth = (lightType && lightType.image && lightType.image.complete)
+                ? lightType.image.width / SPRITE_SCALE
+                : size;
+            const drawX = x + (size - imgWidth) / 2;
+            const drawY = y;
+
+            // Local point relative to the tile center, before rotate/flip.
+            const relX = (drawX + LIGHT_SPARK_LOCAL_X) - centerX;
+            const relY = (drawY + LIGHT_SPARK_LOCAL_Y) - centerY;
+
+            // Matches the render transform order: translate(center) -> flip -> rotate -> translate(-center).
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            const rotatedX = relX * cos - relY * sin;
+            const rotatedY = relX * sin + relY * cos;
+            const flippedX = needsFlip ? -rotatedX : rotatedX;
+
+            return { x: centerX + flippedX, y: centerY + rotatedY };
+        }
+
         function setLightPoleDirection(direction) {
             if (!inspectorTile) return;
 
@@ -7510,6 +7951,13 @@
             lightPoles.forEach(pole => {
                 // A pole that hasn't faded in yet casts no light
                 if (!isTileVisible(pole)) return;
+
+                // A burned-out pole (dead, or mid-flicker in its "off" phase)
+                // casts no light either — see updateLightBurnout().
+                const burnoutState = window.lightBurnoutState
+                    ? window.lightBurnoutState[`${pole.gridX},${pole.gridY}`]
+                    : null;
+                if (burnoutState && (burnoutState.dead || !burnoutState.isOn)) return;
 
                 // Get the center of the light pole tile in pixel coordinates
                 const poleCenterX = offsetX + pole.gridX * TILE_SIZE + TILE_SIZE / 2;
@@ -8036,20 +8484,12 @@
                     // Add event listeners to train inputs
                     setupTrainInputListeners();
                 } else if (selectedTile.tileType.id === 'light_pole') {
-                    // Light pole tiles show tabbed interface with direction tab
-                    if (!currentInspectorTab || currentInspectorTab !== 'direction') {
-                        currentInspectorTab = 'direction';
-                    }
-
+                    // Light pole tiles: title with the direction visual to its
+                    // right (like the stop inspector), other fields along the bottom.
                     inspectorContent.innerHTML = `
-                        <div class="inspector-title-row">
+                        <div class="inspector-header">
                             <h3>${selectedTile.tileType.name}</h3>
-                            <div class="inspector-tabs">
-                                <button class="inspector-tab active" data-tab="direction">Direction</button>
-                            </div>
-                        </div>
-                        <div class="inspector-panel active" id="directionPanel">
-                            <div class="drag-tab-content">
+                            <div class="inspector-grid">
                                 <div class="drag-canvas-wrapper">
                                     <canvas id="inspectorCanvas" width="${23 * TILE_SIZE}" height="${TILE_SIZE}"></canvas>
                                     <div class="drag-checkboxes" id="directionCheckboxes">
@@ -8057,21 +8497,31 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>${renderFadeInField()}
+                        </div>
+                        <div class="inspector-field-row">
+                            ${renderFadeInField()}
+                            <div class="inspector-field">
+                                <label for="lightBurnOutOn">Burn out on:</label>
+                                <input type="text" id="lightBurnOutOn" value="${getSelectedBurnOutOn()}" style="width:80px;height:30px;background-color:#2a2a2a;border:1px solid #555;color:#fff;font-size:14px;text-align:center;border-radius:4px;">
+                            </div>
+                            <div class="inspector-field">
+                                <label for="lightBurnOutDelay">Burn out delay:</label>
+                                <div class="stepper">
+                                    <button type="button" data-input="lightBurnOutDelay" data-action="decrement">−</button>
+                                    <input type="number" id="lightBurnOutDelay" min="0" max="9999" step="0.2" value="${getSelectedBurnOutDelay()}">
+                                    <button type="button" data-input="lightBurnOutDelay" data-action="increment">+</button>
+                                </div>
+                            </div>
+                        </div>
                     `;
 
                     // Draw the inspector grid
                     drawInspectorGrid();
 
-                    // Add event listeners to tabs
-                    document.querySelectorAll('.inspector-tab').forEach(tab => {
-                        tab.addEventListener('click', () => {
-                            switchInspectorTab(tab.dataset.tab);
-                        });
-                    });
-
                     // Add event listeners to direction checkboxes
                     setupLightPoleDirectionListeners();
+
+                    setupLightInputListeners();
 
                     setupStepper('tileFadeIn', setSelectedFadeIn);
                 } else {
@@ -8162,6 +8612,28 @@
             if (tile) tile.fadeIn = value;
         }
 
+        function getSelectedBurnOutOn() {
+            const tile = findGridTile(selectedTile);
+            return tile && tile.burnOutOn != null ? tile.burnOutOn : '';
+        }
+
+        // Writes to the tile the inspector was built for, not the live selection
+        function setSelectedBurnOutOn(value) {
+            const tile = findGridTile(inspectorTile);
+            if (tile) tile.burnOutOn = value;
+        }
+
+        function getSelectedBurnOutDelay() {
+            const tile = findGridTile(selectedTile);
+            return tile && tile.burnOutDelay != null ? tile.burnOutDelay : 0;
+        }
+
+        // Writes to the tile the inspector was built for, not the live selection
+        function setSelectedBurnOutDelay(value) {
+            const tile = findGridTile(inspectorTile);
+            if (tile) tile.burnOutDelay = value;
+        }
+
         // Shared "Fade in" inspector row, used by track pieces, lights and stops.
         function renderFadeInField() {
             if (!selectedTile || !supportsFadeIn(selectedTile.tileType)) return '';
@@ -8197,6 +8669,58 @@
                 trainProperties[trainId] = {};
             }
             trainProperties[trainId][property] = value;
+        }
+
+        function setupLightInputListeners() {
+            const burnOutOnInput = document.getElementById('lightBurnOutOn');
+            if (burnOutOnInput) {
+                burnOutOnInput.addEventListener('change', (e) => {
+                    setSelectedBurnOutOn(e.target.value);
+                });
+                burnOutOnInput.addEventListener('input', (e) => {
+                    setSelectedBurnOutOn(e.target.value);
+                });
+            }
+
+            const burnOutDelayInput = document.getElementById('lightBurnOutDelay');
+            if (burnOutDelayInput) {
+                burnOutDelayInput.addEventListener('change', (e) => {
+                    let value = parseFloat(e.target.value);
+                    if (isNaN(value) || value < 0) value = 0;
+                    if (value > 9999) value = 9999;
+                    value = Math.round(value * 10) / 10;
+                    e.target.value = value;
+                    setSelectedBurnOutDelay(value);
+                });
+            }
+
+            // Setup stepper buttons for burn out delay only — the fade in
+            // stepper's buttons are wired separately via setupStepper().
+            document.querySelectorAll('.stepper button[data-input="lightBurnOutDelay"]').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const input = document.getElementById('lightBurnOutDelay');
+                    if (!input) return;
+
+                    let value = parseFloat(input.value);
+                    const min = parseFloat(input.min);
+                    const max = parseFloat(input.max);
+                    const step = parseFloat(input.step) || 1;
+
+                    if (button.dataset.action === 'increment' && value < max) {
+                        value = Math.min(value + step, max);
+                    } else if (button.dataset.action === 'decrement' && value > min) {
+                        value = Math.max(value - step, min);
+                    }
+
+                    // Round to avoid floating point issues
+                    value = Math.round(value * 10) / 10;
+                    input.value = value;
+
+                    // Trigger change event to save the value
+                    input.dispatchEvent(new Event('change'));
+                });
+            });
         }
 
         function setupTrainInputListeners() {
@@ -8456,7 +8980,9 @@
                         originalGridY: tile.gridY,
                         layer: currentPaletteTab,
                         trainId: tile.trainId, // Preserve train ID when dragging existing tile
-                        fadeIn: tile.fadeIn // Preserve fade in when moving a track piece
+                        fadeIn: tile.fadeIn, // Preserve fade in when moving a track piece
+                        burnOutOn: tile.burnOutOn,
+                        burnOutDelay: tile.burnOutDelay
                     };
                     // Remove from appropriate layer while dragging
                     if (currentPaletteTab === 'tracks') {
@@ -8526,6 +9052,11 @@
                         newTile.fadeIn = draggedTile.fromPalette
                             ? getDefaultFadeIn()
                             : (draggedTile.fadeIn != null ? draggedTile.fadeIn : 0);
+                    }
+                    if (!draggedTile.fromPalette) {
+                        // Tiles dragged around the grid keep their burn out settings.
+                        newTile.burnOutOn = draggedTile.burnOutOn;
+                        newTile.burnOutDelay = draggedTile.burnOutDelay;
                     }
                     trackTiles.push(newTile);
 
@@ -8614,7 +9145,9 @@
                 tileTypeId: tile.tileType ? tile.tileType.id : null,
                 color: tile.color,  // Legacy support for old color-only tiles
                 trainId: tile.trainId,
-                fadeIn: tile.fadeIn
+                fadeIn: tile.fadeIn,
+                burnOutOn: tile.burnOutOn,
+                burnOutDelay: tile.burnOutDelay
             }));
 
             const objectTilesToSave = objectTiles.map(tile => ({
@@ -8683,7 +9216,9 @@
                     tileType: tileType || null,
                     color: tile.color,  // Legacy support for old color-only tiles
                     trainId: tile.trainId,
-                    fadeIn: tile.fadeIn
+                    fadeIn: tile.fadeIn,
+                    burnOutOn: tile.burnOutOn,
+                    burnOutDelay: tile.burnOutDelay
                 };
             });
 
@@ -9132,7 +9667,9 @@
                     gridY: tile.gridY,
                     tileTypeId: tile.tileType ? tile.tileType.id : null,
                     trainId: tile.trainId,
-                    fadeIn: tile.fadeIn
+                    fadeIn: tile.fadeIn,
+                    burnOutOn: tile.burnOutOn,
+                    burnOutDelay: tile.burnOutDelay
                 })),
                 objectTiles: objectTiles.map(tile => ({
                     gridX: tile.gridX,
@@ -9163,7 +9700,9 @@
                     gridY: tile.gridY,
                     tileType: tileType || null,
                     trainId: tile.trainId,
-                    fadeIn: tile.fadeIn
+                    fadeIn: tile.fadeIn,
+                    burnOutOn: tile.burnOutOn,
+                    burnOutDelay: tile.burnOutDelay
                 };
             });
 
@@ -9242,7 +9781,10 @@
 
             applyRunLevelData(JSON.parse(JSON.stringify(initialRunLevelData)));
 
+            solved_count = 0; // Reset before initLightBurnoutAnimations() checks burn out triggers against it
+
             initTileFadeIn();
+            initLightBurnoutAnimations();
             persistentLitPoints = computeLitPoints();
             persistentLitPoints = addInterpolatedLitPoints(persistentLitPoints);
             initTrainAnimations();
@@ -9262,6 +9804,8 @@
             keypadHoveredButton = null;
             keypadResetPressed = false;
             keypadResetHovered = false;
+            keypadLevelSelectPressed = false;
+            keypadLevelSelectHovered = false;
 
             runDragTrain = null;
             runDragLastWorld = null;
@@ -9366,7 +9910,10 @@
         function loadSprites(callback) {
             const spritesToLoad = [
                 { id: 'mm_light_pole', src: 'data:image/png;base64,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' },
+                { id: 'mm_light_pole_dead', src: 'data:image/png;base64,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' },
                 { id: 'mm_light', src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHcAAADsCAYAAABOmDkKAAABgWlDQ1BzUkdCIElFQzYxOTY2LTIuMQAAKJF1kd8rg1EYxz/byO9GXCgulnC1aShxo0xCLWmmDDfbu19qm7f33dJyq9yuKHHj1wV/AbfKtVJESq7lkrhhvZ53W23JntNzns/5nvM8nfMcsPoTSlKvcUMyldZ80x7HUmDZUfdGA+200U9XUNHVifl5L1Xt6wGLGe9cZq3q5/61pnBEV8BSLzyuqFpaeEbYu5FWTd4V7lDiwbDwubBTkwsK35t6qMivJseK/GOy5vdNgrVV2BGr4FAFK3EtKSwvpzeZyCil+5gvaY6kFhck9oh3o+NjGg8OZplikhEGGZN5BBdDDMiKKvnuQv4c65KryKySRWONGHHSOEXNSPWIxKjoERkJsmb///ZVjw4PFas3e6D2xTA++qBuB/I5w/g+Noz8Cdie4SpVzl8/gtFP0XNlrfcQ7FtwcV3WQntwuQ2dT2pQCxYkm7g1GoX3M2gJQPstNK4Ue1ba5/QR/JvyVTewfwD9ct6++gty6mfrmeGpnQAAAAlwSFlzAAAuIwAALiMBeKU/dgAAG+NJREFUeJztXXmwJVV5/859C4iCEApFQpISSLQoxMKoGUEMawSRACaADpEIBRhBWRKxAEMiS0KkgAoBgqgDwaDIoiwlVFkxZSVTGdBhNywZahiWmWFm3izADLO9d++XP24v3/nO951z+t6+9/V7c35V/br7dPfZfufbzunbDyAhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhYdgw012BOoFrr66lPea3voF15DPdmNHkBsis2jaV0JlK9owi10NmbDvofTGEiffMFLIbT65CaAzJ/UiuRp6V3nSSG0uuQKqP5NC9Wjs5Odq5RGLjiW4cuRGkSoT60orj079694477DDeufHq49/Oi6NFC8ehNOe8SSQ3htwAqRp5PF3cf/3vfvauG275n2u3TrbnAsDU9tuP3vjTH5x62dFHfHAqLz5iH0t+t+AGkDzt5FYklROqHRf7cy96YOd/nffIPe12549oIWNjIw/cNe+UM0747H5b8qoI+5hjuufH00rytJHbI6kSoSrJ51x43263/Nuj97bbuL9Uh/HxkV/cct2fnfqluR/dBH4iY9Lonh9PC8nTQi4jtgqpsRucef6977vthwt/0m7jH/jqMj4+suC6K4895ZwzDlyfV6/HDYS9dTxsgodOboDYWFJbvrQvnX3X79xxzxP3ttv4ezF1Gh8befKKb3567jfOPWQdlGR1wCVQSmssyUMlVyE2htRW4LhI+4sv37nPj3/61F3tNu5epW5jYyPPX/r1w+deeuERq8AlsyOkhcgGdgwwZIKHRm4FYn1EtpRjAwCtuWf+aN+773/6jnYbd+2ljmNjI0suOu+QuZdf8unl4BLbUdJiJBqE/cAJHgq5AWJDUso3nm4AoHXSaXcc8JMHf3NrB/Hd/dR1dLS19Lwvf/LUa6747MugE8u3kESDcNzthAESPHByKxArERe1nfDF2+c8+PBz3+kg7lBHnUdHWxNnn/6J067/p+MWgUymb5PI7eTdAUMkuDWITBVoxPqIG8m2UbaN5dvRJ8477IGHnv1eXcQCAExNdXa7ad6Cfz/r/Hs/TMvKNl6XUVLPEVJvzbzwiKC2pUqOgZJLKu0jlhKskUlJHc/2Y0ec8N3P/Pw//+9GBNiu7rq327jLrXcsvO0vv3LXx8AlOESyZEq0uHxgGFjmgjqmjdJUMB35kjQUx5865ubj5j+y5Fsw4AHaMmbTicfvf8GP553yKAC0s60TOO6QY26zVWerbvU8DLXMB5CP2FxqufRSiRmfc+QNn5//yJLLh1H/DuI77r7v6X/53BdvPxyY5gBZgiX1zCV4KBh050jqmJ9Lkqra2D889PrTfvX4axcPuN4WEGD8/oeevfqYk289BmQVnZNMBydX0epsWr6v2/YOhNzAGxMh54mSW3Tc5GR7fL8Drz37iaeXfW0QdQ4BAUYe/o8XLjvsuFuOB5lYKsUx0ssJrh3DUsta6OPYUhCkNiP2gmdfWHn6EOrrQ+uX8xd/86CjbvoC6MTGOFf5nqJ26a2dXMFDBnLuI1j0kN9av3n8Ax+7+pJFi1d/vu669ooFv37l/I8edv1p4NpdTrIktUOT3mHYXB+p3rh21cSG7fedc823lry67k8HXM/KePypZWft/8nrzp6cbFMHi9vbGNtLUav0DoBcPlcOAGGV7Gwvvbxmh/0Pvu6qZa+/9Sf117Ee/Oa5Fafsd+C1F2zaPDkO4YmNkN0lhNYTEQ1Kck1Gssk2ki6GQpYz9cyzr+/48cNvuGblqg0HD6h+tWHR4tWf23fONRev37BlHNxQTiJXIFUKfftHreTi2m9L88jZMbYI2dmxS/D8R5a8+1PH3Hz9mnUbP15n3QaJl19dd/S+c665/PUVb70DZGKzPdKNkDqYWauaJVccdZ74FlsAOJLvH3j4f3c95uRbb37zrc0frrdeg8fS5W8ecsAf//NVL7408c6sTXTL2hlSx3S++dt9kzwIm2uU0ehzpkZu++Fj75l75p3fW79hywfrr9NwsHJiwyfmHHnTtU8+s+xdIE+rRsa69ajnQdtcKFWx7jGvnNgwds6F99+8cdPkXgOqz9Cwdt3Gjxz15/OuBL9DxQh2/JNmecu49iojjDgyKovKU5trAKB10ml3HL1p8+Tv11WX6caq1W8fdN7FD+4PYoxr9YNCZtMkF/mrQlYFubRSm9tqtztjtdWjIZiaao8zB6qlaDBBgrvANf/YlwTXqJYRANEAZvuywsJmz9Z87ayDHh0fH5mory7Ti5123O7FC84+eBG4M1Nks6IHsCS124fQr/SO9vW0A4RSCxcj0IAxAPYItQg++YQPrV05sf6c7/9g4bGr1769z0jLtEwBMK2WaQEA/PYee+y5yy47v0cueyAzeATdjl61atXSidVrJgAAEBERs1133/ndPXd+/pK/PvShfd6/61Yo1LA6M9U9xqJPTFkYGuiT3Vp6BNdcYbJ6MofJKHPHpjtdZ4q1Ub6Xp/PGDzgVWjsdWUede0Z74k6YfO7nYC/ItwFgKtsmybaV7ScBYSsATpH7p8Ba5EfyzhWi2fVveya4JrXsvGBgSDpVx7aq7qrxlr3PR3KB8jmcfLOe+vYB3PpGduSGeVhsLbltuTNpTTUyb9lKA1xzec8CWKNaJmoYDNhkGkIqXx2xpL0cBCjEf2XHTh9w8xvEeZQGobL6g1w151qtA4UzZRUEDbG5ua2lBOd7TnShsiXCPZsBwI2r6qlvH+i8tZqlGLndxV5oW+kRC+mZrc1DJJw+tYyr/554e9b710zd8AkNGu+KsR8vCWBq6WLAzsZ+69wzcPI16LyxzjVDAGARiuBpm22a5B8pCH1aHTXYXOq2O42mjWgJDVMaDkrD21OAG5/uv849orP+iSxOAWWjbYBwO9U0KPa9C25N5AKJb1GTRIdsLql54wBEYrNOba/5Vf917gkI7eWPEXIjSfYR7JFeEuvi6kuNWKMA6iJXqhiZ0BA3oragJagk2uiyQ6defBpwy0v917siOm//Gtorljr1UVVpFKn2hjap9lYdfZGLqy8xQuMk1WKcTbXHqjTkWwemXr2rn3pXbyhOweSiexVp5WlSOyQiKZk+jaf4IGH0J7mqrY0YuRLhqKpksKV3yQvQWb+gr7pXQWftz6AzMQGWaAlEU6mT2mYPboHIjmdwV0efarmwo3kl2GjrgN2AjkJ2p3zO6b/uxB457u43L7x1KOq58/bjsOWx+0k9UKhX95ySbLcf5HZLEiqmAa6+qLLd7d/mlqM1VMlAo6xRqzlURGK2boUtT10POLWm7zaobdv6CmxZ+B0A7Fiaw5ZaSYrpQJbaD8JA5+21tx685p7JxYkLbTIK58kZrSzeExvFr/kaWpLcWbsWtiy8DHDL4l7boaKz8UnYvOAfADdt4arEHWh8K37zFVK/Ur/QZ6nwVG5CDWrZGWHUvoQaKozc4n5JOrj0IHTWrYVN86+Ezlv/3V9b8iZhB9prHoDN/3Ud4MaNRGql8vkx6D/m80qxnY4dGmlk16qjj+lHBNBXlUyxoTX11r1m0LA5ZZ53NkwNHbKGHLOyt0zC5vnfhdG9fglje30BzHbezxOp6Gx8AiYX3Q3tZUuVO1DZkzo7sNveJYr1jUWesZvZm9TmBfcEnPibjCADUM4VZ5PhJn9vKF/is37UBd2lvXLpr/wpxggYGAX7pTKTLR1KA0Gu/9gHPgQj750D5p0fATOyk78hU6uhs+EJaC9fAFMvvRhqNjumOrO7BIjQBkOWAJEuBSJdDsw2a/kvWz5E8hkGywUHs9u10Uz3JLm46oKu2uh2rSR5YEtmIan0fppurEdZRoJUGPHuXLi3Pv8MwPPPABgDo+/fG1o7vhfM9juDGd8FADuAW9cBbl4HnTdeh6lXX6nafKFst9b2ggCtM91TKTV6tlKRYfSoltEuywAwooSNE26lA82JFKKQGKhXeY4wtfhFAAhJZBVoOlPRnyqxYKnoIp2qaMxGa5YHVnOZ+yOXn1oyjIaRxjdyLW+QqGVzkjXbOx3ghAriJlaRaTMnjZ93216QWq3ZPXrL1PsjoY89C5Onk02M/Uh+HYBYL7kZG4BTV+vzF1JEYOTJHKdvyizpZMaqc6P9pMqSi6u+yrw51YZm02yWre0+a5idJdlneWc9ZvLnmiS1OZj0BqslS2fxSpGVDkRlo1NUJKqrZcSML58tKY4lVZyTDizdzaEg2jBSkd84HcCseqX4KsOVnDD76hCpPDgscgGAeMoUpKKip8xItmwyybv4y8jkUtsIAUZ2JtlgfqtAMLL+ceLe3OZWcqp6sLmYF1IeW3ZTnCsVbAwCm4bL7+W2LE8L2bzQvdNhg4G0U+on8E/H8vn3zO6u/EqU2qokubjyr2x7i2QEGp9KttQwvQ6qBNujX7O1TRBfKqnoXrLAJVJqOPNpcqHNJTheNVdUy1amRrjUJc0ggDu9KNll8rBrbEEmddqNbQZOKDOMKgGSrZVUMv0lQsFwlfHcD7m8sqxSbCvnk4Hdn+edZW4o0/lxEySUgteH2dqYfmIkmoJMAKtvuBRjdH/0Qq5P8iTp7DaISrYGA+hW3vCDJhGNxAEEMM7aXH6VD2R3kGPxhw+CPK2SSgaoSq7tJXOiJDXMvUIAey7ZJqz8S0duBTKHrrGp+kXS7x4WimSf10zuKQY79ZoBV5xhzO7f9/ZNNLm44vRshCEozhM7dxYFKMEALhN5h2h2NoLkaRFqZmu9lVAIdNJJX1lFme4QipPg3mxu6e5QCZNsKpfmCoXMGFTw4h2HVLKtrE+L+7BUYrWTK9hby0OWKlyAe4TKbWKhTXSoOKReZww46tinkst+slpeZE1UtI6q5ALpa060XTFjqWYOjdmqJEr58Pi4V/jykbxlehyKd2m+lFhj96P4hka0Wo4TnxWnmqzsbG/9/JJ8Ac4I30s27gc7jXV//rwp86UNn1FAtuVvU3TfsEDogP2j62xzfoydv5FBv7qe/zAboVwuArP77SrLcZLresn0WHIQAvmJKVT9clXcZJIlqa0S89qSaztTrN1o7wOaOV4tI0B3fsGqIN+HNilTfqIR3FS4cW1x7MS9oSxIP4mL+eWAQes5EZHkZqPI9YM4YVKFDLlNI5gSywkGmFkkY1CkupCkllxTlgGtyQ5/OUF1h6/PJfYWAOibiMb6oEluQ4V/QFHYXWqT2ad7TL5Cxb3GmQJKbn5OX8ug/71kqtw7bz9meyxtLzo2t/ggCgCCed+PRJIjJFdUxd1j/k6ykSQ3Fkj1AoKzQD8jQI2hpq4BrH6RXpIDAOR22FpAyI77VsvB/i0rReNemu6SHlGI0x9Gv8arEsxLua8SpHCHx7j+zkMe6oDURsPOPcc2Ym1urpLzzKTRpnnOxhZKN3N2sbS7luzG2LHYgRjhjfjz8D0bm69hfUnz5zaXnlMv3Gt3veTi8pOM6+N4n8idJ6XC5Y38QXYvZql129w61HwMsUJIJD3rLNZzT9lTLCrpJQKSS9S6Kf5KFZKkGIR7ee24V+yvbfMh1V1R0Y4vQ6WUpnG1nJ9jvsPlJxqzxz1O2WFyy8OSXlkNS9JKKwMerjWjOBOJ5tIbuK0AJVIQoILw/K1L4lTJxVR3qKiqNI6EagT7Mp8tUptDk17tVOgzJrkWmTyPftSyTJABMCaf3rQqaNQwiJ9LxnwmSywHV8fkXG0eDYNYuqWW0T6XnSpdTy4/IXOO6BptMYHBv8hKJiesiQx2nD1jxM/B8/rU7UwNA5Lz1CH7TndCAunXXunmTmCIP+ukExoAkE9m7HGfRXKsze1Kqm4nfI6WJ1vFS565iHBpxT5kx0Fv2XaqFLurkyv/qiDPuDqhRSUMPcmfmW2qmZNKpYzep0QVjrnjHnN+X6mihd7ySC4CoDHKShCvmM9rDoHa3tkgvQB6bBu2t+WEBb+Wp5M+IlpZgEguLjvWiANNj3WzdEd1ayRLUjtbiKVgDhUC+NtIJVTQjsRMojVQRKfK81shy9nrjhr+U9nwb4NAuIbCMbINZvAmtYW3yddGQnC2dbPiX9pzeOoKZQlFLUdJH/9cfTfNeFWypoJnkwTzuhMmIt/BRks169Jr5elm7SE36B3LaXr1EeznuufGItWfw8xDJlLFMSgEaypY8qR5Ea4NzuCQi8s+w0gtnjXyuXifz6miJCPgjJdUH1zdadtdH9HApDfbF31MnpWzcyVXD4FowZKnHOMla+p4WyCYn4baa5gQUYJZnyFNLyA4VM7gIs5Rnp4bftmw65tzH3U4fE7GTNxQ3vIO7qm/JB6yLLvZ4tKjCgETbC4dDCT4kZGHP0ow7mQsTVhwKZ5N8LRHvcQnLhQfB9HOwlXNmkNlk9SV+lJNGFEF+yYxUHDQNJJnG3ivE7EMNrl0osQXFyye0MoaGLm49EijCJItmUVBpixAl1kkVyVCY4kN5dEvBjm4XLGSizVysmN/lezs81HfRbtMrnpZmveVGMafkUcQe4BDus/TaT1jUCR3xQrJcbjIgOecS2uRj9Wfis0tiJP0vVCweN2uA60FOlIoqPFZA0kt82ssWYs8LE1KtJ6dJS49wpg9f4ERkisJlzjBEfmsU9hstrcALplVbTALPX0KzD4uyMXXDs0+s0uJkyYsiGPlFk7SLc4kIiUbOpuhSGzoVgd5dML8DRLjZodEctngKemSSAw4MKowag5UHQ5RE+H3eLz+hvYpQe2x/JMK5XVPnEs4KLK1nCheqFGEUZPaPtXyjNHmEqGSeo54lBHsXC40KgJIkltmUhLn/p8CAGv1pyA1ZhJDOo4EC+tqx0AHS4+ePdKf6dA9cO+YZ6+Qq2lOx7kzgjTTKkjesNI44xy4GLqkVi2QOjyh0M2WXrmkchLDTc89ZZEYgIxcfO1gHksJeSnBtgZUz4jEUkK9nTJTEGNTJX0am3VMeFTsRt06GPaA9uqM0UYVLZVVxrCCZgWhVSBIrvX9IQ20rw3bqPRKkxhavlYoRGyuRbjPg0awfmcrV2IbQsh58njPoSwcAcwmMRDA/nKBL+yJmsDIMjMAzo+qeybW54DVGUoNY9Bxb5naTJ+kkUe0bEuUklv+0EuahHC9ZadAJzlXF7RkFnhXgq/TZ4oW4CpYqbcaAkkEuw5VdkbUsiEXpBjXyYfHu/khJTXkgm+LqBASibe4oZDzqpLlUHkykgeI8I6jN2zlIdG2TrIUEoWkmHBhOVP0ZivN5y0bIa1ML0+pJ8dVr/2rXpfkwaFX5T9YoHgcNdS1UAgM2O9U8Rkq2ufISAUD4vJfUAi7BblN6EM9V2SrUimDVCZWX3GCFcdKgkOwE9tS5OTymSZfeAPk3hiHiZCae8+9itRM1eY+U6WGQL68iFrWy/FMP2plcun214LFuVkGM5WkWiCr5vI0snMkW2unh2ao8gTDVHQA9J9QFHn1E+PONvhUM8R3kZ/gbBJD1JTcoQqQmse24rRi8pJleKQ4kFxe5wIjOFR2aGoKQQ0WoE5YWAXRmxO8pCqOlRrz2iYPS5+H2lzbQUJBWo1zIBUqBSFJJbuQVHPsxEaXK+RCJDpUXHcrM1FFvqr3Z/jdduE+wY3hPVLwg4qmSWAfAfV3QyaAoZ+CVprEKByqYOnd0ZRLPf+Ocr+CW4PgN0d3eGoifoRbC31UaWNzy1KZRbo25rOHJYcKSVqDurU5CKjmYJdRdez0se8dKoDgNy6KU59DFVXLAUAaUNIAbcKgi7C3MdUUf3FgqWGugnmH+FR0k7xkqTeaQCSFrz4hr9mjDZF6y/R7ymKZxubH41DJaR5nqpf+DuWlCeigxpjWhqjyqJcb6zVz75gSzeLcItl5JxkCmlXoMcN72I7DakEwsO/xubqh9pmW7rO3PgdMTLW95fIeU37yMTiImMMkzphEVHCbRmx860M3RCK3KaEQSKFUSZJx+IqduOhHcgepV6ug33qEfAEqweVxUaogiHKIFAyFjHjoj6GlzOrymmuS/L4js4oPe30ETqxeRhVNDWUoJE0wxDhRQmnFEl+D1XEjbK92kyOaEchnrSwh4mo5m96KErTsovX/f2gh0x0KzRRI0ip4zCIXqkoGsNWykW4AfeIiv5ePGO6WqzVLKBDyoGOIpnBWhXz30Yw1h4ISq5Da1AmiQSJGaSE/qRDL6f2n/Jwk5r9v8RIsW6sMgNlOpIToNjObW/l5517BW7Zu8gw7Oq9sOWSSzU2Igy8kEm4BAFuYLGeMzFDl/lHIxuZPOANAU8fJmfIjJu5V7lOIzpJdtYz5Pfku2o0nI8jwaw3AoOZAHJNWQ4ZO/BtRtHu731sOZW/oGi7dF883TGqxWt/3NCxreShGHQez45MYStOVZHQ85+aHQM2rEYVPRVeZ5LCW/KRrUpm+OFaZkfKJSrN7un9UDoP4Bc3e+jxqtuTn48ZOFMIcvirEWzTbCfShDhUdMKxKFrhkbxMxiQHgGYEI9qcQtIyq2t7ZMiJUFRiA5C1XzqaqWuaJmrj32qjZhqrtjnCs4ovR1HIFSTP84YjKJEQgd5wowdFqGSBqbhlAiVvzsMdjbxN6QEAlA0Dc540qqWVtFoCRnVATNJIV1a1NYjjcOh6asKRnAOJtbkIcfM6THg4pLhF7tbVIJ4Ras1B23iYozQn9gf03MftSCPybGII+dpyrUnrRF98m9AGNuQinqrwc+Q8srBvowkCyt4MFetRyEJ5vP3qnDUNzygm9w0eiEhZ549xgGVxCtbctkvQOBj30KzqSqzhITlJgPjmhBnhmqyy+VOKVGSq1HCkskiqSUC8Cq0LypdAMlaCO1bcskvTWBoRysqGXVaEuhM8DBgtOse1Q4HSnb8oxU8/2pdhQiDtRydYOD75pyJ7mliXvmGZa59ptgg3fBEalS9r/z5Xu75JqrNySeh48UDiL6uPy84AOHMfJplUqWELdkbDfqd8W4m5me1FV1aMkUXr3qf+ZqLq715/fbCSTQnOqxHZLNjcPeWJsbbKvg4eHSP+v4LnNJQSqExcgnCcMB1oYJKLHhYMkuUOGQqp/gkNbOEBw/3tX8oybg5DtRQDf12zsB9LERXMgCJRse6nkZiQ6/8YEhGOARPIwUcnWAgCYvSfQs54rZhb8zUnCwOFVxcKqkPhmhTb1CJCkdjoQK0zOJAa9oL0Q10tBCYOFb6XI+/9zNZubMP3wrRQV+5Zyk/ZgktgYVO2l+Ps5B5WX/GwpRdXuAojSnHwuAKiD4FAOAcfK/TlJVUdKirkCdUroE9Ed7AuFQo5UssHDhY9U0bGSQqFYRyqJaDOg8tBS0qONdsK0wus1S/8cmd6Qphybh+ipSDa3rP6iT8skkT1YxGhNdTG/1xmqKoUnDAbBvtfmln0ZJWmdXsR4zQAgh0JViE5oDjSHqkhIc8kqYsf0tHRb1MJB8pD7xlAVm9dzjlmsTyQ3D9oIirK5AOF55ET2cFF1IcHylqWbk2PVfCQetkX8PxC8vzuxMMyyAAAAAElFTkSuQmCC' },
+                { id: 'mm_light_dead', src: 'data:image/png;base64,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' },
+                { id: 'mm_light_flash', src: 'data:image/png;base64,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' },
                 { id: 'lit_rails_straight', src: 'data:image/png;base64,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' },
                 { id: 'lit_rails_curve', src: 'data:image/png;base64,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' },
                 { id: 'mm_stop_background', src: 'data:image/png;base64,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' },
@@ -9377,7 +9924,8 @@
             const standaloneSprites = [
                 { target: 'keypadDeleteSprite', src: 'data:image/png;base64,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' },
                 { target: 'keypadSubmitSprite', src: 'data:image/png;base64,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' },
-                { target: 'keypadResetSprite', src: 'data:image/png;base64,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' }
+                { target: 'keypadResetSprite', src: 'data:image/png;base64,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' },
+                { target: 'keypadLevelSelectSprite', src: 'data:image/png;base64,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' }
             ];
 
             let loadedCount = 0;
@@ -9410,6 +9958,7 @@
                 if (sprite.target === 'keypadDeleteSprite') keypadDeleteSprite = img;
                 if (sprite.target === 'keypadSubmitSprite') keypadSubmitSprite = img;
                 if (sprite.target === 'keypadResetSprite') keypadResetSprite = img;
+                if (sprite.target === 'keypadLevelSelectSprite') keypadLevelSelectSprite = img;
             });
         }
 
@@ -9441,7 +9990,7 @@
         }
     </script>
     <script>
-        const EXPORT_LEVELS = [{"name": "Crossroads", "data": {"trackTiles": [{"gridX": 8, "gridY": 5, "tileTypeId": "stop", "trainId": null, "fadeIn": 0}, {"gridX": 7, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 6, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 5, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 4, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 3, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 2, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 1, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 5, "gridY": 4, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0}, {"gridX": 6, "gridY": 4, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0}, {"gridX": 16, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 15, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 14, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 13, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 12, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 11, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 10, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 9, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 11, "gridY": 6, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1}, {"gridX": 10, "gridY": 6, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1}, {"gridX": 8, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5}, {"gridX": 8, "gridY": 3, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5}, {"gridX": 8, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5}, {"gridX": 8, "gridY": 1, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5}, {"gridX": 8, "gridY": 0, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5}, {"gridX": 9, "gridY": 3, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 5}, {"gridX": 9, "gridY": 2, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 5}, {"gridX": 8, "gridY": 6, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 7, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 9, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 10, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 11, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 7, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4}, {"gridX": 7, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4}, {"gridX": 0, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}], "objectTiles": [{"gridX": 0, "gridY": 5, "tileTypeId": "train", "trainId": 1}, {"gridX": 0, "gridY": 5, "tileTypeId": "train", "trainId": 5}, {"gridX": 0, "gridY": 5, "tileTypeId": "train", "trainId": 7}, {"gridX": 8, "gridY": 0, "tileTypeId": "train", "trainId": 4}, {"gridX": 16, "gridY": 5, "tileTypeId": "train", "trainId": 6}, {"gridX": 16, "gridY": 5, "tileTypeId": "train", "trainId": 2}, {"gridX": 8, "gridY": 11, "tileTypeId": "train", "trainId": 3}, {"gridX": 8, "gridY": 11, "tileTypeId": "train", "trainId": 8}], "trainProperties": {"1": {"direction": "right", "mathFacts": [null, true], "text": ["1", "−", "0"], "textFontSize": 22, "speed": 1.1, "spawnOn": "0", "spawnDelay": 0}, "2": {"direction": "left", "mathFacts": [null, true], "text": ["4", "+", "4"], "textFontSize": 22, "speed": 1.2, "spawnOn": "1"}, "3": {"direction": "top", "speed": 1.4, "spawnOn": "4", "mathFacts": [null, true], "text": ["2", "−", "0"], "textFontSize": 22}, "4": {"direction": "bottom", "spawnOn": "5", "mathFacts": [null, true], "text": ["5", "−", "3"], "textFontSize": 22, "speed": 0.9}, "5": {"direction": "right", "mathFacts": [null, true], "text": ["10", "+", "1"], "textFontSize": 22, "speed": 1.4, "spawnOn": "2"}, "6": {"direction": "left", "mathFacts": [null, true], "text": ["12", "+", "0"], "textFontSize": 22, "speed": 1.3, "spawnOn": "2", "spawnDelay": 4.7}, "7": {"direction": "right", "mathFacts": [null, true], "text": ["2", "+", "5"], "textFontSize": 22, "speed": 1.4, "spawnOn": "4", "spawnDelay": 2.2}, "8": {"direction": "top", "mathFacts": [null, true], "text": ["0", "+", "11"], "textFontSize": 22, "spawnOn": "6", "cars": 3, "speed": 1.1}}, "nextTrainId": 9, "lightPoleProperties": {"11,6": "top", "10,6": "top", "7,7": "right", "7,8": "right", "9,3": "left", "9,2": "left"}}}, {"name": "Delayed Trains", "data": {"trackTiles": [{"gridX": 4, "gridY": 7, "tileTypeId": "stop", "trainId": null, "fadeIn": 0}, {"gridX": 15, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 5, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 6, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 7, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 8, "gridY": 7, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 0}, {"gridX": 14, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 13, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 15, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0}, {"gridX": 14, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0}, {"gridX": 13, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0}, {"gridX": 12, "gridY": 9, "tileTypeId": "curved_track_tr", "trainId": null, "fadeIn": 0}, {"gridX": 12, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 0}, {"gridX": 12, "gridY": 7, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 0}, {"gridX": 11, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 10, "gridY": 7, "tileTypeId": "curved_track_br", "trainId": null, "fadeIn": 0}, {"gridX": 10, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 0}, {"gridX": 10, "gridY": 9, "tileTypeId": "curved_track_tl", "trainId": null, "fadeIn": 0}, {"gridX": 9, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 8, "gridY": 9, "tileTypeId": "curved_track_tr", "trainId": null, "fadeIn": 0}, {"gridX": 8, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 0}, {"gridX": 1, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 2, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 3, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 1, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1}, {"gridX": 2, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1}, {"gridX": 4, "gridY": 6, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 4, "gridY": 5, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 4, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 4, "gridY": 3, "tileTypeId": "curved_track_br", "trainId": null, "fadeIn": 4}, {"gridX": 5, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 6, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 6, "gridY": 5, "tileTypeId": "curved_track_tr", "trainId": null, "fadeIn": 4}, {"gridX": 7, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 5, "tileTypeId": "curved_track_tl", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 3, "tileTypeId": "cross_track", "trainId": null, "fadeIn": 4}, {"gridX": 7, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 8, "gridY": 1, "tileTypeId": "curved_track_br", "trainId": null, "fadeIn": 4}, {"gridX": 9, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 10, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 10, "gridY": 3, "tileTypeId": "cross_track", "trainId": null, "fadeIn": 4}, {"gridX": 9, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 10, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 10, "gridY": 5, "tileTypeId": "curved_track_tr", "trainId": null, "fadeIn": 4}, {"gridX": 11, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 12, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 6, "gridY": 3, "tileTypeId": "cross_track", "trainId": null, "fadeIn": 4}, {"gridX": 6, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 6, "gridY": 1, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 4}, {"gridX": 5, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 4, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 3, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 2, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 1, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 0, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 3, "gridY": 2, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4}, {"gridX": 2, "gridY": 2, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4}, {"gridX": 1, "gridY": 2, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4}, {"gridX": 4, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 1}, {"gridX": 4, "gridY": 9, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 1}, {"gridX": 4, "gridY": 10, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 1}, {"gridX": 3, "gridY": 10, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1}, {"gridX": 3, "gridY": 9, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1}, {"gridX": 16, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0}, {"gridX": 10, "gridY": 1, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 4}, {"gridX": 0, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1}, {"gridX": 12, "gridY": 5, "tileTypeId": "curved_track_tl", "trainId": null, "fadeIn": 4}, {"gridX": 11, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 13, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 14, "gridY": 3, "tileTypeId": "curved_track_tl", "trainId": null, "fadeIn": 4}, {"gridX": 14, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 14, "gridY": 1, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 4}, {"gridX": 13, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4}, {"gridX": 12, "gridY": 1, "tileTypeId": "curved_track_br", "trainId": null, "fadeIn": 4}, {"gridX": 12, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4}, {"gridX": 12, "gridY": 3, "tileTypeId": "cross_track", "trainId": null, "fadeIn": 4}, {"gridX": 4, "gridY": 11, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 1}], "objectTiles": [{"gridX": 0, "gridY": 1, "tileTypeId": "train", "trainId": 4}, {"gridX": 16, "gridY": 9, "tileTypeId": "train", "trainId": 1}, {"gridX": 16, "gridY": 9, "tileTypeId": "train", "trainId": 6}, {"gridX": 0, "gridY": 7, "tileTypeId": "train", "trainId": 2}, {"gridX": 4, "gridY": 11, "tileTypeId": "train", "trainId": 3}], "trainProperties": {"1": {"direction": "left", "mathFacts": [null, true], "text": ["3", "+", "9"], "textFontSize": 22, "speed": 1.3, "spawnOn": "0,1"}, "2": {"direction": "right", "mathFacts": [null, true], "text": ["3", "+", "9"], "textFontSize": 22, "speed": 0.9, "spawnDelay": 3, "spawnOn": "1,4,6"}, "3": {"direction": "top", "mathFacts": [null, true], "text": ["0", "+", "6"], "textFontSize": 22, "speed": 0.9, "spawnOn": "1,4,6", "spawnDelay": 8}, "4": {"direction": "right", "mathFacts": [null, true], "text": ["11", "+", "1"], "textFontSize": 22, "spawnOn": "4", "speed": 1.3}, "6": {"direction": "left", "mathFacts": [null, true], "text": ["5", "−", "1"], "textFontSize": 22, "speed": 1.3, "spawnOn": "6", "spawnDelay": 0}, "7": {"direction": "right", "mathFacts": [null, true], "text": ["10", "+", "0"], "textFontSize": 22, "speed": 0.9, "spawnOn": "6"}}, "nextTrainId": 8, "lightPoleProperties": {"1,8": "top", "2,8": "top", "3,8": "top", "3,2": "top", "2,2": "top", "1,2": "top", "3,10": "right", "3,9": "right"}}}];
+        const EXPORT_LEVELS = [{"name": "First Stop", "data": {"trackTiles": [{"gridX": 10, "gridY": 8, "tileTypeId": "stop", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 9, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 7, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 6, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 5, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 3, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 2, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 1, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 0, "gridY": 8, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 7, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": "", "burnOutDelay": null}, {"gridX": 1, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": "2", "burnOutDelay": 0}, {"gridX": 3, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": "1", "burnOutDelay": null}, {"gridX": 5, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": "2", "burnOutDelay": null}, {"gridX": 9, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": "3", "burnOutDelay": null}, {"gridX": 4, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": "3", "burnOutDelay": null}, {"gridX": 2, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": "4", "burnOutDelay": null}, {"gridX": 8, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": "6", "burnOutDelay": null}, {"gridX": 6, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": "5", "burnOutDelay": null}], "objectTiles": [{"gridX": 0, "gridY": 8, "tileTypeId": "train", "trainId": 1}], "trainProperties": {"1": {"direction": "right", "mathFacts": [null, true], "text": ["6", "–", "5"], "textFontSize": 22, "spawnOn": "0,1,2,3,4,5,6", "speed": 1.4}}, "nextTrainId": 2, "lightPoleProperties": {}}}, {"name": "Crossroads", "data": {"trackTiles": [{"gridX": 8, "gridY": 5, "tileTypeId": "stop", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 7, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 6, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 5, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 3, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 2, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 1, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 5, "gridY": 4, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 6, "gridY": 4, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 16, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 15, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 14, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 13, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 12, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 11, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 9, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 11, "gridY": 6, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 6, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 3, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 1, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 0, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 5, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 9, "gridY": 3, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 5, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 9, "gridY": 2, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 5, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 6, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 7, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 9, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 10, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 11, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 7, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 7, "gridY": 7, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 0, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}], "objectTiles": [{"gridX": 0, "gridY": 5, "tileTypeId": "train", "trainId": 1}, {"gridX": 0, "gridY": 5, "tileTypeId": "train", "trainId": 5}, {"gridX": 0, "gridY": 5, "tileTypeId": "train", "trainId": 7}, {"gridX": 8, "gridY": 0, "tileTypeId": "train", "trainId": 4}, {"gridX": 16, "gridY": 5, "tileTypeId": "train", "trainId": 6}, {"gridX": 16, "gridY": 5, "tileTypeId": "train", "trainId": 2}, {"gridX": 8, "gridY": 11, "tileTypeId": "train", "trainId": 3}, {"gridX": 8, "gridY": 11, "tileTypeId": "train", "trainId": 8}], "trainProperties": {"1": {"direction": "right", "mathFacts": [null, true], "text": ["1", "−", "0"], "textFontSize": 22, "speed": 1.1, "spawnOn": "0", "spawnDelay": 0}, "2": {"direction": "left", "mathFacts": [null, true], "text": ["4", "+", "4"], "textFontSize": 22, "speed": 1.2, "spawnOn": "1"}, "3": {"direction": "top", "speed": 1.4, "spawnOn": "4", "mathFacts": [null, true], "text": ["2", "−", "0"], "textFontSize": 22}, "4": {"direction": "bottom", "spawnOn": "5", "mathFacts": [null, true], "text": ["5", "−", "3"], "textFontSize": 22, "speed": 0.9}, "5": {"direction": "right", "mathFacts": [null, true], "text": ["10", "+", "1"], "textFontSize": 22, "speed": 1.4, "spawnOn": "2"}, "6": {"direction": "left", "mathFacts": [null, true], "text": ["12", "+", "0"], "textFontSize": 22, "speed": 1.3, "spawnOn": "2", "spawnDelay": 4.7}, "7": {"direction": "right", "mathFacts": [null, true], "text": ["2", "+", "5"], "textFontSize": 22, "speed": 1.4, "spawnOn": "4", "spawnDelay": 2.2}, "8": {"direction": "top", "mathFacts": [null, true], "text": ["0", "+", "11"], "textFontSize": 22, "spawnOn": "6", "cars": 3, "speed": 1.1}}, "nextTrainId": 9, "lightPoleProperties": {"11,6": "top", "10,6": "top", "7,7": "right", "7,8": "right", "9,3": "left", "9,2": "left"}}}, {"name": "Delayed Trains", "data": {"trackTiles": [{"gridX": 4, "gridY": 7, "tileTypeId": "stop", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 15, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 5, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 6, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 7, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 7, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 14, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 13, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 15, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 14, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 13, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 12, "gridY": 9, "tileTypeId": "curved_track_tr", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 12, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 12, "gridY": 7, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 11, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 7, "tileTypeId": "curved_track_br", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 9, "tileTypeId": "curved_track_tl", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 9, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 9, "tileTypeId": "curved_track_tr", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 1, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 2, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 3, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 1, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 2, "gridY": 8, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 6, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 5, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 3, "tileTypeId": "curved_track_br", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 5, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 6, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 6, "gridY": 5, "tileTypeId": "curved_track_tr", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 7, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 5, "tileTypeId": "curved_track_tl", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 3, "tileTypeId": "cross_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 7, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 8, "gridY": 1, "tileTypeId": "curved_track_br", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 9, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 3, "tileTypeId": "cross_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 9, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 5, "tileTypeId": "curved_track_tr", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 11, "gridY": 5, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 12, "gridY": 4, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 6, "gridY": 3, "tileTypeId": "cross_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 6, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 6, "gridY": 1, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 5, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 3, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 2, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 1, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 0, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 3, "gridY": 2, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 2, "gridY": 2, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 1, "gridY": 2, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 8, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 9, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 10, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 3, "gridY": 10, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 3, "gridY": 9, "tileTypeId": "light_pole", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 16, "gridY": 9, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 0, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 10, "gridY": 1, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 0, "gridY": 7, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 12, "gridY": 5, "tileTypeId": "curved_track_tl", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 11, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 13, "gridY": 3, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 14, "gridY": 3, "tileTypeId": "curved_track_tl", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 14, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 14, "gridY": 1, "tileTypeId": "curved_track_bl", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 13, "gridY": 1, "tileTypeId": "horizontal_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 12, "gridY": 1, "tileTypeId": "curved_track_br", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 12, "gridY": 2, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 12, "gridY": 3, "tileTypeId": "cross_track", "trainId": null, "fadeIn": 4, "burnOutOn": null, "burnOutDelay": null}, {"gridX": 4, "gridY": 11, "tileTypeId": "vertical_track", "trainId": null, "fadeIn": 1, "burnOutOn": null, "burnOutDelay": null}], "objectTiles": [{"gridX": 0, "gridY": 1, "tileTypeId": "train", "trainId": 4}, {"gridX": 16, "gridY": 9, "tileTypeId": "train", "trainId": 1}, {"gridX": 16, "gridY": 9, "tileTypeId": "train", "trainId": 6}, {"gridX": 0, "gridY": 7, "tileTypeId": "train", "trainId": 2}, {"gridX": 4, "gridY": 11, "tileTypeId": "train", "trainId": 3}], "trainProperties": {"1": {"direction": "left", "mathFacts": [null, true], "text": ["3", "+", "9"], "textFontSize": 22, "speed": 1.3, "spawnOn": "0,1"}, "2": {"direction": "right", "mathFacts": [null, true], "text": ["3", "+", "9"], "textFontSize": 22, "speed": 0.9, "spawnDelay": 3, "spawnOn": "1,4,6"}, "3": {"direction": "top", "mathFacts": [null, true], "text": ["0", "+", "6"], "textFontSize": 22, "speed": 0.9, "spawnOn": "1,4,6", "spawnDelay": 8}, "4": {"direction": "right", "mathFacts": [null, true], "text": ["11", "+", "1"], "textFontSize": 22, "spawnOn": "4", "speed": 1.3}, "6": {"direction": "left", "mathFacts": [null, true], "text": ["5", "−", "1"], "textFontSize": 22, "speed": 1.3, "spawnOn": "6", "spawnDelay": 0}, "7": {"direction": "right", "mathFacts": [null, true], "text": ["10", "+", "0"], "textFontSize": 22, "speed": 0.9, "spawnOn": "6"}}, "nextTrainId": 8, "lightPoleProperties": {"1,8": "top", "2,8": "top", "3,8": "top", "3,2": "top", "2,2": "top", "1,2": "top", "3,10": "right", "3,9": "right"}}}];
     </script>
 
     <script>
@@ -9509,11 +10058,44 @@
             startRunLevel(EXPORT_LEVELS[index].data);
         }
 
+        // Manual "return to level select" (the keypad's button, not the
+        // level-complete celebration): fades out over the run board using
+        // game.html's generic run-fade helper, swaps screens once black, then
+        // fades the level-select board in from black. Kept separate from the
+        // win celebration's star sequence and the level-select -> run fade.
+        let exportManualReturnFadeInPhase = false;
+        let exportManualReturnFadeInStart = 0;
+
+        returnToLevelSelect = function () {
+            if (runFadePhase || exportFadePhase || exportCompletionPhase) return;
+            startRunFadeOut(() => {
+                exportShowLevelSelectScreen();
+                // Paint the level-select canvas solid black immediately so the
+                // screen swap doesn't flash its last pre-transition frame
+                // before levelSelectLoop's next tick starts fading it in.
+                const lsCanvas = document.getElementById('levelSelectCanvas');
+                const lsCtx = lsCanvas.getContext('2d');
+                lsCtx.save();
+                lsCtx.setTransform(1, 0, 0, 1, 0, 0);
+                lsCtx.fillStyle = '#000000';
+                lsCtx.fillRect(0, 0, lsCanvas.width, lsCanvas.height);
+                lsCtx.restore();
+                exportPlayingLevelIndex = null;
+                exportManualReturnFadeInPhase = true;
+                exportManualReturnFadeInStart = performance.now();
+            });
+        };
+
         // A level is done once nothing solvable is left: no math facts on any
-        // train, no tile reveal or spawn animation in flight.
+        // train, no tile reveal or spawn animation in flight, and no train
+        // template (e.g. a respawning train with "spawn on" 0,1,2,...) still
+        // has a future respawn still to come.
         function exportLevelIsComplete() {
             if (runModeState !== 'gameplay' || feedbackAnim) return false;
-            if (tileFadeAnim || spawnAnimations.length > 0) return false;
+            if (tileFadeAnim || spawnAnimations.length > 0 || pendingSpawnTemplates.length > 0) return false;
+            for (const template of trainSpawnTemplates) {
+                if (template.spawnOnValues.some(v => v > solved_count)) return false;
+            }
             for (const train of trainAnimations) {
                 if (train.mathFacts && train.mathFacts.some(v => v)) return false;
             }
@@ -9712,6 +10294,13 @@
                     exportFadeStart = performance.now();
                     exportPlayLevel(exportFadeToIndex);
                 }
+            }
+
+            if (exportManualReturnFadeInPhase) {
+                const lsCtx = document.getElementById('levelSelectCanvas').getContext('2d');
+                const t = Math.min(1, (performance.now() - exportManualReturnFadeInStart) / EXPORT_FADE_DURATION);
+                exportDrawScrim(lsCtx, LEVEL_SELECT_IMAGE_WIDTH, LEVEL_SELECT_IMAGE_HEIGHT, 1 - t);
+                if (t >= 1) exportManualReturnFadeInPhase = false;
             }
 
             if (exportCompletionPhase !== 'selectReveal' && exportCompletionPhase !== 'starShrink') return;
