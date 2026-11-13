@@ -90,11 +90,23 @@ Each entry in `portfolio.pieces` supports:
   "itchioSize":  [1920, 1080],        // native resolution of the itch.io game (default 1920×1080)
   "video":       "",                  // native <video> fallback (rarely used)
   "image":       "path/or/url",       // card thumbnail on main page
+  "heroLink":    "../my-build.html",  // wraps the image/heroLabel in a link opening in a new tab
   "comingSoon":  true                 // DEPRECATED — use heroLabel instead
 }
 ```
 
 Hero priority: `youtubeId` → `vimeoId` → `itchioEmbed` → `video` → `image` → play-button placeholder.
+`heroLink` layers on top of `image`/`heroLabel` rather than competing in that
+priority chain — it just makes the thumb/label clickable (`target="_blank"`).
+
+**Memory Metro's build file:** Memory Metro doesn't use an itch.io/YouTube embed —
+`heroLink` points at a single self-contained `.html` game export sitting in the
+repo root (not under `portfolio/`), e.g. `../Memory_Metro.html`. Oliver periodically
+drops a new export in the repo root under a new filename and asks to "replace the
+existing memory metro build with `<name>`." That means: update `heroLink` in
+config.json to `../<name>.html` **and** delete the previous build file from the
+repo root (`git rm`/`rm` it) so stale multi-hundred-KB exports don't pile up. Leave
+the result uncommitted per his usual workflow.
 
 **itch.io embed scaling gotchas:**
 - The iframe is rendered at native size (`itchioSize`) then CSS-scaled down to fit the container width using `transform: scale(s)` with `transform-origin: top left`.

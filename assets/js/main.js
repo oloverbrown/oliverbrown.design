@@ -129,6 +129,52 @@ function renderAbout(cfg) {
 
   const blocks = cfg.about.blocks || [];
 
+  const darkenAndSaturate = (hex, lightenAmount = 0.15, saturateAmount = 0.1) => {
+    const n = parseInt(hex.slice(1), 16);
+    const r0 = ((n >> 16) & 255) / 255;
+    const g0 = ((n >> 8) & 255) / 255;
+    const b0 = (n & 255) / 255;
+    const max = Math.max(r0, g0, b0);
+    const min = Math.min(r0, g0, b0);
+    let h, s;
+    const l = (max + min) / 2;
+    const d = max - min;
+    if (d === 0) {
+      h = s = 0;
+    } else {
+      s = d / (1 - Math.abs(2 * l - 1));
+      if (max === r0) h = ((g0 - b0) / d) % 6;
+      else if (max === g0) h = (b0 - r0) / d + 2;
+      else h = (r0 - g0) / d + 4;
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    s = Math.min(1, s * (1 + saturateAmount));
+    const newL = l * (1 - lightenAmount);
+    const c = (1 - Math.abs(2 * newL - 1)) * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = newL - c / 2;
+    let r1, g1, b1;
+    if (h < 60) { r1 = c; g1 = x; b1 = 0; }
+    else if (h < 120) { r1 = x; g1 = c; b1 = 0; }
+    else if (h < 180) { r1 = 0; g1 = c; b1 = x; }
+    else if (h < 240) { r1 = 0; g1 = x; b1 = c; }
+    else if (h < 300) { r1 = x; g1 = 0; b1 = c; }
+    else { r1 = c; g1 = 0; b1 = x; }
+    const r = Math.round((r1 + m) * 255);
+    const g = Math.round((g1 + m) * 255);
+    const b = Math.round((b1 + m) * 255);
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+  const childColors = ((cfg.theme && cfg.theme.childColors) || []).filter((_, i) => i !== 1).map((c) => darkenAndSaturate(c));
+  let highlightColorIdx = 0;
+  const colorizeWords = (phrase) => phrase.split(/(\s+)/).map((token) => {
+    if (!childColors.length || /^\s*$/.test(token)) return token;
+    const color = childColors[highlightColorIdx % childColors.length];
+    highlightColorIdx++;
+    return `<span style="color: ${color}">${token}</span>`;
+  }).join('');
+
   const block = (item) => {
     const text = typeof item === 'string' ? item : item.text;
     const phrases = typeof item === 'object' && item.highlight
@@ -139,7 +185,7 @@ function renderAbout(cfg) {
       let html = text;
       for (const phrase of phrases) {
         if (html.includes(phrase)) {
-          html = html.replace(phrase, `<span class="about__highlight">${phrase}</span>`);
+          html = html.replace(phrase, `<span class="about__highlight">${colorizeWords(phrase)}</span>`);
         }
       }
       p.innerHTML = html;

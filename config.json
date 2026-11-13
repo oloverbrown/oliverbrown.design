@@ -9,8 +9,8 @@
   "nav": [
     { "label": "Oliver Brown", "href": "#about" },
     { "label": "learning games", "href": "#learning-games" },
-    { "label": "classroom projects", "href": "#classroom-projects" },
-    { "label": "game games", "href": "#game-games" },
+    { "label": "classroom games", "href": "#classroom-games" },
+    { "label": "puzzle games", "href": "#puzzle-games" },
     { "label": "contact", "href": "#contact" },
     { "label": "resume", "href": "Oliver Brown Resume.pdf", "target": "_blank" }
   ],
@@ -42,7 +42,7 @@
       { "prefix": "for", "text": "Deep, Conceptual Learning", "color": "#FDB5CB", "description": "I build tools that teach more than information, targeting concepts, higher-order skills, and learner dispositions." }
     ],
     "blocks": [
-      { "text": "11 years designing playful, hands-on learning as a classroom teacher taught me what rich learning looks like and today's EdTech has a long way to go. My graduate study and ongoing teaching at Harvard have kept me plugged in to the latest research on digital learning and play.", "highlight": ["classroom teacher", "graduate study and ongoing teaching at Harvard"] },
+      { "text": "11 years designing playful, hands-on learning as a classroom teacher taught me what rich learning looks like and today's EdTech has a long way to go. My graduate study and ongoing teaching at Harvard have kept me plugged in to the science and current practice of digital learning design.", "highlight": ["classroom teacher", "graduate study and ongoing teaching at Harvard"] },
       { "text": "In my 5 years designing and product mananging learning games at ST Math, I led the development of 27 innovative games and 9 accessibility features across 3 products, reaching more than 2 million K-12 students and 174,000+ educators in 7,400+ schools.", "highlight": ["designing and product mananging learning games at ST Math"] }
     ],
     "skills": [
@@ -61,6 +61,20 @@
     "heading": "learning games",
     "pieces": [
       {
+        "slug": "memory-metro",
+        "title": "MEMORY METRO",
+        "subtitle": "A math + working memory game",
+        "details": "Solo Designer & Developer | 2026",
+        "heroLabel": "Play Memory Metro",
+        "heroLink": "../Memory_Metro.html",
+        "overview": [
+          "This solo-designed and developed learning game builds on cognitive science research connecting fact fluency and working memory development. Built around a small number of intuitive mechanics, it presents players with a diverse set of math and working memory challenges full of surprises and desirable difficulty. The game also offers robustly customizable math fact practice settings, and a star system encouraging level replay is currently under construction. Memory Metro's compact but expressive design system reflects my focused approach to learning game design."
+        ],
+        "disclosures": "Memory Metro began as an unpublished prototype I designed and developed solo at MIND Education. It is shared here for portfolio purposes only and is not an official or released MIND Education product.",
+        "image": "memory_metro_thumb.png",
+        "video": ""
+      },
+      {
         "slug": "treasure-box",
         "title": "TREASURE BOX",
         "subtitle": "ST Math games that teach place value with hands-on digital manipulatives",
@@ -71,20 +85,6 @@
         "disclosures": "Treasure Box art by Pamela Tseng. Video music: \"drunken sailors\" by ALKAKRAB, used with permission. Treasure Box was developed by MIND Education. This footage is shared for portfolio purposes to showcase my work as Lead Designer on the project. All rights to Treasure Box belong to MIND Education.",
         "image": "https://img.youtube.com/vi/AZBvvtajFcA/maxresdefault.jpg",
         "youtubeId": "AZBvvtajFcA",
-        "video": ""
-      },
-      {
-        "slug": "memory-metro",
-        "title": "MEMORY METRO",
-        "subtitle": "A math + working memory game prototype built solo with Claude Code",
-        "details": "Solo Designer & Developer | MIND Education | 2026",
-        "heroLabel": "click to play",
-        "heroLink": "../Memory_Metro.html",
-        "overview": [
-          "This unpublished prototype, solo designed and developed with Claude Code for a project at MIND Education, has two learning goals: build math fact fluency and strengthen working memory. Avoiding visual and thematic complexity, the design uses a small number of elegant, intuitive mechanics to generate a wide range of levels full of discovery, surprise, and humor, while precisely titrating both mathematical and working-memory difficulty as students progress. The result is a compact but expressive design system that reflects my focused approach to learning game design."
-        ],
-        "disclosures": "Memory Metro is an unpublished prototype I designed and developed solo during my time at MIND Education. It is shared here for portfolio purposes only and is not an official or released MIND Education product.",
-        "image": "memory_metro_thumb.png",
         "video": ""
       },
       {
@@ -100,7 +100,7 @@
         "image": "VP_thumbnail.png"
       },
       {
-        "category": "classroom projects",
+        "category": "classroom games",
         "slug": "greenfield-game",
         "title": "THE GREENFIELD GAME",
         "subtitle": "A classroom-based simulation where students run a small town and make decisions about economics, government, and infrastructure",
@@ -114,7 +114,7 @@
         "video": ""
       },
       {
-        "category": "classroom projects",
+        "category": "classroom games",
         "slug": "migration-data-poetry",
         "title": "MIGRATION DATA POETRY PROJECT",
         "subtitle": "A whole-school project combining migration data and poetry to explore the complex reality of international migration",
@@ -128,7 +128,7 @@
         "video": ""
       },
       {
-        "category": "game games",
+        "category": "puzzle games",
         "slug": "staircase-of-song",
         "title": "STAIRCASE OF SONG",
         "subtitle": "Record music to build a staircase out of the underworld",
@@ -142,7 +142,7 @@
         "image": "staircase_of_song_thumbnail.png"
       },
       {
-        "category": "game games",
+        "category": "puzzle games",
         "slug": "dress-rehearsal",
         "title": "THE DRESS REHEARSAL DID NOT GO WELL",
         "subtitle": "Solve spatial puzzles as the director of an ill-fated dress rehearsal",
@@ -157,7 +157,7 @@
         "video": ""
       },
       {
-        "category": "game games",
+        "category": "puzzle games",
         "slug": "space-tinder",
         "title": "SPACE TINDER",
         "subtitle": "Swipe left or right on procedurally-generated interdimensional aliens",
